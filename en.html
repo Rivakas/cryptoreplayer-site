@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CryptoReplayer – User guide</title>
+  <link rel="stylesheet" href="guide.css">
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <h1>CryptoReplayer – User guide</h1>
+  <div class="langs"><a href="lt.html" hreflang="lt">LT</a><a href="en.html" aria-current="page">EN</a><a href="ru.html" hreflang="ru">RU</a></div>
+</header>
+<p class="meta">Application version 0.1.0 · guide updated 2026-10-11</p>
+
+<p>CryptoReplayer replays historical cryptocurrency trades and simulates trading on them. It plays back the real trade flow of <b>Bybit</b> and <b>Deribit</b> on your computer and lets you trade in it as if the market were live: with fees, funding payments, slippage, latency, leverage, liquidation, options and multi-leg option strategies. All market data is free; no account and no API keys are needed.</p>
+
+<div class="warn"><b>Important.</b> This is a tool for learning and for researching strategies. No orders are ever sent to an exchange; you trade with virtual money only. Simulated results do not guarantee the same results in the real market and are not investment advice.</div>
+
+<nav class="toc"><b>Contents</b>
+<ol>
+  <li><a href="#start">Requirements and start-up</a></li>
+  <li><a href="#quick">Quick start</a></li>
+  <li><a href="#screen">Screen overview</a></li>
+  <li><a href="#load">Loading data</a></li>
+  <li><a href="#replay">Replay controls</a></li>
+  <li><a href="#charts">Charts</a></li>
+  <li><a href="#draw">Drawing tools</a></li>
+  <li><a href="#trade">Trading</a></li>
+  <li><a href="#fills">How orders are filled</a></li>
+  <li><a href="#account">Account, margin and fees</a></li>
+  <li><a href="#tabs">Bottom tabs and CSV</a></li>
+  <li><a href="#options">Options</a></li>
+  <li><a href="#builder">Strategy builder</a></li>
+  <li><a href="#scanner">Scanner</a></li>
+  <li><a href="#recorder">Option quote recording</a></li>
+  <li><a href="#settings">Settings</a></li>
+  <li><a href="#keys">Keyboard and mouse</a></li>
+  <li><a href="#lang">Language, help and guide</a></li>
+  <li><a href="#limits">Data sources and limitations</a></li>
+  <li><a href="#privacy">Privacy</a></li>
+  <li><a href="#faq">Troubleshooting and FAQ</a></li>
+</ol>
+</nav>
+
+<h2 id="start">1. Requirements and start-up</h2>
+<h3>Microsoft Store version</h3>
+<p>Install CryptoReplayer from the Microsoft Store and start it from the Start menu. Nothing else needs to be installed – Node.js and the browser engine are inside the app. Windows 10 (2004) or later, 64-bit, is required.</p>
+<ul>
+  <li>The data cache, recorded quotes and a technical log (<code>logs\server.log</code>) are kept in the app's data folder, which Windows removes when the app is uninstalled.</li>
+  <li>The app uses local port 47821 (or the next free one); it is reachable only from your computer.</li>
+  <li>Zoom with <kbd>Ctrl</kbd>+<kbd>+</kbd> / <kbd>Ctrl</kbd>+<kbd>−</kbd> / <kbd>Ctrl</kbd>+<kbd>0</kbd>, full screen with <kbd>F11</kbd>.</li>
+</ul>
+<h3>Running from source</h3>
+<ul>
+  <li><b>Operating system:</b> Windows 10 / 11 (launchers <code>start.vbs</code> and <code>stop.vbs</code>). The server also runs on macOS or Linux with <code>node server.js</code>.</li>
+  <li><b>Node.js 22.15 or newer</b> (<a href="https://nodejs.org">nodejs.org</a>). The first time, run <code>npm install</code> in the application folder.</li>
+  <li><b>Browser:</b> a current Chrome, Edge or Firefox.</li>
+  <li><b>Internet connection</b> to download historical data. Days already downloaded load from disk.</li>
+</ul>
+<h3>Starting on Windows</h3>
+<ol>
+  <li>Double-click <code>start.vbs</code>. The server starts in the background without a console window and the browser opens <code>http://127.0.0.1:8787</code>. If the server is already running, only the browser opens.</li>
+  <li><code>stop.vbs</code> stops the server (only the one from this folder). The log is written to <code>server.log</code>.</li>
+</ol>
+<p>Manually: run <code>node server.js</code>, then open <code>http://127.0.0.1:8787</code> in the browser. The server listens on the local computer only.</p>
+<h3>Settings via environment variables or <code>.env</code></h3>
+<p>In a <code>.env</code> file in the application folder (see <code>.env.example</code>) or as environment variables:</p>
+<table>
+  <tr><th>Variable</th><th>Default</th><th>Purpose</th></tr>
+  <tr><td><code>PORT</code></td><td>8787</td><td>Server port. If you change it, also change <code>PORT</code> in <code>start.vbs</code>.</td></tr>
+  <tr><td><code>HOST</code></td><td>127.0.0.1</td><td>Address the server listens on.</td></tr>
+  <tr><td><code>CR_DATA_DIR</code></td><td><code>./data</code></td><td>Data cache folder. One day of Bybit BTCUSDT takes ~5 MB, so keep it outside synchronised folders (OneDrive etc.).</td></tr>
+  <tr><td><code>CHD_API_KEY</code></td><td>–</td><td>Optional CryptoHFTData key. Without it 60 order book files per minute are allowed.</td></tr>
+  <tr><td><code>CR_RECORD</code></td><td>–</td><td><code>1</code> – turn option quote recording on when the server starts.</td></tr>
+  <tr><td><code>CR_RECORD_INTERVAL</code></td><td>300</td><td>Recording interval in seconds.</td></tr>
+</table>
+<h3>Data cache</h3>
+<p>Each downloaded day is saved as <code>data/&lt;exchange&gt;/&lt;type&gt;/&lt;symbol&gt;/&lt;date&gt;.crt.gz</code> and loads in a fraction of a second next time. The cache can be deleted at any time – the data will be downloaded again when needed.</p>
+
+<h2 id="quick">2. Quick start</h2>
+<ol>
+  <li>In the top bar choose the <b>Exchange</b> (e.g. Bybit), <b>Type</b> (Linear) and <b>Instrument</b> (e.g. BTCUSDT).</li>
+  <li>Set <b>Trade from (UTC)</b> – the day you want to trade from – and the number of <b>Days</b>. To see earlier history, set an earlier date in <b>Warm-up from (UTC)</b>.</li>
+  <li>Click <b>Load</b>. The first time the day is downloaded (the status line shows the progress); later it loads from the cache.</li>
+  <li>Click <b>▶</b> or press <kbd>Space</kbd>. Change the pace in <b>Speed</b>.</li>
+  <li>In the <b>Order</b> panel on the right enter a quantity and click <b>Buy / Long</b> or <b>Sell / Short</b> (or press <kbd>B</kbd> / <kbd>S</kbd>).</li>
+  <li>Follow the position, PnL and account in the <b>Account</b> panel and the <b>Positions</b> tab; close with <b>Close</b> or <kbd>X</kbd>.</li>
+  <li>Review the results in the <b>Trades</b>, <b>Fills</b> and <b>Equity curve</b> tabs; save them with <b>Export CSV</b>.</li>
+  <li>Not sure what a field or column means? Press <kbd>F1</kbd> and hover over it to see an explanation.</li>
+</ol>
+
+<h2 id="screen">3. Screen overview</h2>
+<table>
+  <tr><th>Area</th><th>Contents</th></tr>
+  <tr><td>Top bar</td><td>Exchange, type, instrument, "expired" (Deribit), warm-up and trading dates, number of days, <b>Load</b>, status line, <b>⚙ Settings</b>, <b>? Help</b>, <b>📖</b> (this guide) and the language picker.</td></tr>
+  <tr><td>Transport bar</td><td>⏮ to start, ▶/⏸, ⏭ candle forward, speed, chart layout, drawing tools, the <b>Chart</b> / <b>Option chain</b> views (when options are available), the timeline, the clock and the time zone.</td></tr>
+  <tr><td>Charts</td><td>One or two price charts with their own intervals. In the corner of each – the interval, the legend and the ⤢, Log, Auto buttons.</td></tr>
+  <tr><td>Right panel</td><td>The order form (or the option form when an option is selected), the Order book (Bybit, when data exists) and the Account.</td></tr>
+  <tr><td>Bottom panel</td><td>Tabs Positions, Orders, Fills, Trades, Strategies, Events, Tape, Equity curve and the CSV export.</td></tr>
+</table>
+<p>Right-hand panels collapse when you click their header, the bottom panel with its chevron button. The splitters between the charts and between the charts and the bottom panel can be dragged; a double-click restores the default size. All of this is remembered in this browser.</p>
+
+<h2 id="load">4. Loading data</h2>
+<h3>Exchanges and contract types</h3>
+<table>
+  <tr><th>Exchange</th><th>Type</th><th>What it is</th></tr>
+  <tr><td>Bybit</td><td>Linear (USDT/USDC)</td><td>Perpetuals and futures; quantity in the base coin, PnL and fees in USDT/USDC. Trades since 2020.</td></tr>
+  <tr><td>Bybit</td><td>Inverse (coin-margined)</td><td>Quantity in USD contracts, PnL and fees in coins (BTC, ETH…).</td></tr>
+  <tr><td>Bybit</td><td>Spot</td><td>No leverage and no shorts. Before ~2022-11-10 the data exists only as monthly files – one download is split into many days.</td></tr>
+  <tr><td>Deribit</td><td>Inverse BTC/ETH</td><td>BTC and ETH perpetuals and futures (coin-settled) and BTC/ETH options.</td></tr>
+  <tr><td>Deribit</td><td>Linear USDC</td><td>USDC perpetuals (e.g. <code>SOL_USDC-PERPETUAL</code>) and USDC options on BTC, ETH, SOL, XRP, AVAX, HYPE, TRX.</td></tr>
+</table>
+<h3>Fields</h3>
+<ul>
+  <li><b>Instrument</b> – click to see the whole list; type to filter it. Only instruments with free data are listed. Once chosen, the status line shows the date range of the data.</li>
+  <li><b>expired</b> (Deribit) – include futures that have already expired.</li>
+  <li><b>Warm-up from (UTC)</b> – how far back the chart shows history before trading. It comes from the exchange kline APIs and is only drawn – you cannot trade in it. Higher intervals automatically get at least ~200 candles, but never more than one year back.</li>
+  <li><b>Trade from (UTC)</b> and <b>Days</b> (1–14) – the period you replay with real trades.</li>
+</ul>
+<p><b>Load</b> downloads the trades, the funding history, the warm-up candles, the Bybit order book (if available) and option data (if the instrument has options). The account is reset and the replay starts from the first trade.</p>
+<div class="note"><b>Data availability.</b> Bybit publishes a day's file the next day around 01:00 UTC, so there is no Bybit data for today. Deribit allows today's (incomplete) data as well – it is not cached. All dates are UTC days.</div>
+
+<h2 id="replay">5. Replay controls</h2>
+<ul>
+  <li><b>▶ / ⏸</b> (<kbd>Space</kbd>) – play / pause.</li>
+  <li><b>⏭</b> (<kbd>→</kbd>) – to the end of the current candle; the step is the smallest interval of the visible charts.</li>
+  <li><b>⏮</b> – back to the start of the period (the account is reset).</li>
+  <li><b>Speed</b> – from 1× to 10000× real time; 60× means one minute per second.</li>
+  <li><b>Timeline</b> – drag forward to fast-forward (orders fill on the way) or back (the account is reset after you confirm).</li>
+  <li>The <b>clock</b> shows the current replay moment. Everything – charts, prices, PnL – is shown only up to this moment.</li>
+  <li><b>Time</b> – the time zone for all displayed times: UTC, Vilnius, London, Berlin, New York, Singapore, Tokyo or your computer's zone. Daylight saving time switches automatically. The date fields and the CSV export stay in UTC.</li>
+</ul>
+
+<h2 id="charts">6. Charts</h2>
+<ul>
+  <li><b>Charts: 2 side by side</b> – two charts (by default 1D on the left and 15 min on the right); <b>1</b> – only the right one. Both are synchronised: the same replay time, positions, orders and drawings.</li>
+  <li><b>Interval</b> (in the corner of each chart): 1s, 5s, 15s, 1m, 5m, 15m, 1h, 4h, 1D. Candles are rebuilt from the trades; nothing is lost.</li>
+  <li><b>Legend</b> – O (open), H (high), L (low), C (close) and the change; hovering shows that candle.</li>
+  <li><b>Zoom:</b> mouse wheel on the chart – time zoom; wheel over the price axis – price zoom; wheel over the time axis – time zoom around the cursor; the axes can be dragged. <b>Auto</b> or a double-click on the price axis restores automatic scaling, <b>⤢</b> shows the whole period, <b>Log</b> switches the logarithmic scale (on by default).</li>
+  <li><b>Marks on the chart:</b> arrows – your fills; solid line – the position entry (long green, short red); orange dotted – the liquidation price; dashed – resting orders (TP orange, SL violet, with the expected PnL). Options are drawn as strike, break-even, TP and SL lines (see <a href="#options">Options</a>).</li>
+  <li><b>Day separators</b> – blue dotted vertical lines at the start of each day in the selected time zone (can be turned off in the settings).</li>
+  <li><b>Clicking the chart</b> (with no drawing tool active) puts that price into the Limit field (switching a market order to Limit) or into the Stop field.</li>
+</ul>
+
+<h2 id="draw">7. Drawing tools</h2>
+<p>In the transport bar under <b>Draw</b>: ╱ trend line and ↗ ray (two clicks), ― horizontal and │ vertical line (one click), colour, line style (solid, dashed, dotted), width (1–4 px), 🔒 lock, ⌫ eraser and 🗑 delete all.</p>
+<ul>
+  <li>Lines are stored by time and price, so they appear on both charts; they are remembered per instrument in this browser.</li>
+  <li>With no tool active: click a line to select it; drag it to move it; drag an end handle to move that end; <kbd>Ctrl</kbd> + drag drags a copy (the original stays); <kbd>Delete</kbd> removes it; <kbd>L</kbd> or 🔒 locks / unlocks it.</li>
+  <li><kbd>Shift</kbd> while placing the second point or dragging an end makes the line exactly horizontal. Trend lines and rays show their on-screen angle at the start.</li>
+  <li>A locked line cannot be moved or deleted (not even with the eraser or "delete all"). <kbd>Esc</kbd> cancels the tool or the selection.</li>
+</ul>
+
+<h2 id="trade">8. Trading</h2>
+<h3>Order form</h3>
+<ul>
+  <li><b>Market</b> – fills immediately (taker fee). <b>Limit</b> – waits for the given or a better price (maker fee). <b>Stop</b> – becomes a market order when the trigger price is reached.</li>
+  <li><b>Quantity</b> – in instrument units: linear and spot – the base coin, inverse – USD contracts. Rounded to the allowed step. The 10 % / 25 % / 50 % / 100 % buttons fill it from the free margin and leverage.</li>
+  <li><b>Take profit / Stop loss</b> – when the order fills, opposite reduce-only orders are placed automatically (TP – limit, SL – stop). They work as OCO: when one fills, the other is cancelled.</li>
+  <li><b>TP/SL units:</b> <b>Price</b> – an absolute price; <b>%</b> – price move from the entry; <b>$ P&amp;L</b> – profit / loss in dollars for the whole order. Enter positive numbers – the side follows Buy / Sell. The resulting prices and PnL are shown below the fields.</li>
+  <li><b>Reduce-only</b> – the order can only reduce or close the position. <b>Post-only</b> (limit) – rejected if it would fill immediately.</li>
+  <li><b>Estimate</b> – order value, margin, fee and the largest possible quantity.</li>
+</ul>
+<p>Shortcuts: <kbd>B</kbd> – market buy, <kbd>S</kbd> – market sell, <kbd>X</kbd> – close the position at market.</p>
+<h3>TP/SL of an open position</h3>
+<p>In the <b>Positions</b> tab click <b>TP/SL</b>: a window opens where TP and SL are set as a price, % or $ from the entry, with a preview and a button to remove them. They cover the whole position and work as OCO; setting them again replaces the old ones.</p>
+
+<h2 id="fills">9. How orders are filled</h2>
+<p>Neither Bybit nor Deribit offers free order book history, so orders are filled against the <b>trade tape</b> (the real historical trades):</p>
+<ul>
+  <li><b>Latency:</b> an order becomes active only after the configured number of milliseconds.</li>
+  <li><b>Market and stop orders</b> fill at the first trade after activation, at its price plus the configured slippage (bps). Where a Bybit order book exists (CryptoHFTData, since mid-2025), a market order walks the book levels and gets their average price.</li>
+  <li><b>Limit orders</b> fill at their own price with the maker fee according to the chosen mode: <b>through</b> – a trade must happen at a better price than the limit (default, conservative); <b>touch</b> – a trade at the limit is enough (optimistic); <b>queue</b> – fills once the size that stood ahead of you in the book has traded (needs the order book).</li>
+  <li>If the limit price is already reached when the order is placed, it fills at once as a <b>taker</b>.</li>
+  <li>While the replay is paused, a market order fills immediately – the tape is advanced to the next trade.</li>
+</ul>
+
+<h2 id="account">10. Account, margin and fees</h2>
+<table>
+  <tr><th>Type</th><th>Quantity</th><th>PnL, fees, margin</th></tr>
+  <tr><td>Linear</td><td>base coin</td><td>quote currency (USDT/USDC)</td></tr>
+  <tr><td>Inverse</td><td>USD contracts</td><td>coins; PnL = qty · (1/entry − 1/exit), the entry price is a harmonic mean</td></tr>
+  <tr><td>Spot</td><td>base coin</td><td>like linear, but with 1× leverage and no shorts; sells are always reduce-only, no funding</td></tr>
+</table>
+<ul>
+  <li><b>Fee</b> = order value × rate. Maker – resting limit orders; taker – market and stop orders, limit orders that fill at once, and liquidations. Rates are set when an instrument is loaded: Deribit – from the API, Bybit – VIP0 (linear / inverse 0.02 % / 0.055 %, spot 0.1 % / 0.1 %). You can enter your own rates in the settings.</li>
+  <li><b>Funding</b> (perpetuals) – a positive rate means longs pay shorts. Payment = position value at the last price × rate. Bybit – at the exchange's funding times, Deribit – every hour (<code>interest_1h</code>).</li>
+  <li><b>Margin</b> = position value / leverage. <b>Liquidation:</b> when equity falls to the maintenance margin (position value × MMR, plus the maintenance margin of options), all orders are cancelled, the position is closed at market with the taker fee and options at their mark price.</li>
+  <li>The <b>mark price</b> for PnL and liquidation is the last trade price.</li>
+</ul>
+<h3>Account panel</h3>
+<p>Equity (wallet + unrealized PnL + option value), Wallet, Free margin, Realized PnL, Fees, Funding, Net PnL (and %), Max drawdown, Trades / won, Profit factor, Volume, Liquidations; with options also Option value, Option IM and Delta. Below – the parameters in use. <b>Reset</b> restores the starting balance and clears the history.</p>
+
+<h2 id="tabs">11. Bottom tabs and CSV</h2>
+<table>
+  <tr><th>Tab</th><th>Contents</th></tr>
+  <tr><td>Positions</td><td>The open Spot/Futures position: size, entry, last price, Max / Min since opening (with times), unrealized and best PnL, liquidation price and margin, fees and funding, TP/SL, the <b>TP/SL</b> and <b>Close</b> buttons. With an option chain loaded – also the Options section.</td></tr>
+  <tr><td>Orders</td><td>Resting orders (RO – reduce-only, PO – post-only) with a <b>Cancel</b> button.</td></tr>
+  <tr><td>Fills</td><td>Every fill: time, side, quantity, price, type, liquidity (maker / taker / liquidation / settlement), fee, realized PnL.</td></tr>
+  <tr><td>Trades</td><td>Closed positions from opening to the full close: entry, exit, Max / Min while held, Max / Min after closing (Spot/Futures – until the current replay time, options – until expiry), best P&amp;L, gross PnL, fees, funding, net. The favourable extreme is highlighted in yellow.</td></tr>
+  <tr><td>Strategies</td><td>Option strategies opened with the builder, with their current P&amp;L and a <b>Close</b> button.</td></tr>
+  <tr><td>Events</td><td>Funding payments, cancellations, rejections, option settlements and TP/SL triggers, liquidations.</td></tr>
+  <tr><td>Tape</td><td>The last 60 market trades; the aggressor – buyer (green) or seller (red).</td></tr>
+  <tr><td>Equity curve</td><td>Equity over time.</td></tr>
+</table>
+<p><b>Export CSV</b> downloads the fills, or – when the <b>Trades</b> or <b>Positions</b> tab is open – the closed trades with the Max / Min columns. Times in the CSV are UTC; column names are in English.</p>
+
+<h2 id="options">12. Options</h2>
+<p>The option chain appears after loading one of these instruments. In all three cases prices and IV come from Deribit option trades – the only free option history.</p>
+<table>
+  <tr><th>Loaded instrument</th><th>Options</th><th>Rules</th></tr>
+  <tr><td>Deribit inverse BTC/ETH (e.g. <code>BTC-PERPETUAL</code>)</td><td>BTC, ETH; premium in coin</td><td>1 contract = 1 coin (min. 0.1); fee 0.03 % per contract, at most 12.5 % of the premium</td></tr>
+  <tr><td>Deribit linear USDC (e.g. <code>SOL_USDC-PERPETUAL</code>)</td><td>BTC, ETH, SOL, XRP, AVAX, HYPE, TRX; price in USDC</td><td>contract size and tick per asset (e.g. BTC 0.01, SOL 10, XRP 1000)</td></tr>
+  <tr><td>Bybit linear BTCUSDT / ETHUSDT</td><td>BTC, ETH; price in USDT</td><td>Bybit: min. 0.01 BTC / 0.1 ETH, tick 5 / 0.1 USDT, fee 0.03 % of the index, at most 7 % of the premium; no delivery fee on daily options</td></tr>
+</table>
+<h3>Chain</h3>
+<ul>
+  <li>The <b>Option chain</b> view shows every strike live at the replay moment for the chosen expiry: position, last real trade, delta, IV, Bid and Ask (calls on the left, puts on the right).</li>
+  <li>The <b>mark</b> price comes from the Black-76 model and an IV smile built from the latest Deribit mark IVs; the forward is derived from Deribit prices. Italic IV means there have been no trades for this expiry yet and the IV is taken from the nearest expiry.</li>
+  <li><b>Bid / Ask are synthetic:</b> mark ± spread (1.5 % by default, see the settings), because there is no historical option book. If real quotes were recorded for that day (see <a href="#recorder">recording</a>), those are used.</li>
+  <li>Blue background – ITM; the orange line – at the forward price. The header shows the index, forward, time left, ATM IV and the spread.</li>
+</ul>
+<h3>Trading options</h3>
+<ul>
+  <li>Click <b>Ask</b> (buy) or <b>Bid</b> (sell) – the option form opens on the right. A market order fills at once (buy at the Ask, sell at the Bid); a limit order fills when the synthetic price reaches your price.</li>
+  <li><b>Short option margin</b> (Deribit standard): initial – max(0.15 − OTM/S, 0.1) + mark, maintenance – 0.075 + mark (per contract, as a share of the index).</li>
+  <li><b>Settlement</b> – on the expiry day at 08:00 UTC at the index; delivery fee min(0.015 % of the quantity, 12.5 % of the intrinsic value).</li>
+  <li><b>Option TP/SL</b> – option price levels; they trigger on the mark price and close the whole position with a market order. Units: price, % of the premium or $.</li>
+  <li><b>Chart lines</b> (as in ChromOptions): a strike line from opening to expiry (call green, put red; bought – solid, sold – dashed), a white break-even line, TP (orange) and SL (violet) at the approximate underlying price.</li>
+  <li><b>Max / Min</b> – extremes of the option mark while the position is open and further until expiry (checked every ≤ 60 s of replay time).</li>
+  <li>Perpetuals and options share one account, so you can hedge; the portfolio delta is shown. Options are not available on a spot account.</li>
+</ul>
+
+<h2 id="builder">13. Strategy builder</h2>
+<p>In the chain click <b>🧩 Strategy builder</b>. Templates: vertical spread, butterfly, iron condor, riskless butterfly, riskless iron condor, collar / conversion, box spread. Choose the variant, expiry, strikes and quantity.</p>
+<ul>
+  <li>You see each leg (buy at the Ask, sell at the Bid, USD value, fee), the payoff diagram at expiry and the metrics: premium, fees, worst and best P&amp;L (with delivery fees), break-even, approximate capital, ROI and APR.</li>
+  <li>The hedge leg <b>U</b> is the loaded instrument (perp / futures); its funding and basis are not included.</li>
+  <li><b>Open strategy</b> opens all legs at market; if one fails, the legs already opened are closed again. The strategy appears in the <b>Strategies</b> tab.</li>
+  <li>The window does not block the replay: prices refresh every second; drag the window by its title, resize it and close it with <kbd>Esc</kbd>.</li>
+</ul>
+
+<h2 id="scanner">14. Scanner</h2>
+<p><b>🔍 Scanner</b> tries every template at the current replay moment over the ~40 strikes nearest to the forward (up to 8 expiries) and ranks them by the APR of the worst-case result (up to 150 results shown). Filters: strategy, expiry, max. days to expiry, min. APR, "Riskless only" (worst ≥ 0), "Hide model arbitrage", "Refresh during replay" (every ~3 s). <b>In builder</b> opens a structure in the builder.</p>
+<div class="warn">Without recorded quotes Bid/Ask are synthetic, so "riskless" and box results are mostly artefacts of the model. ⚠ marks structures whose prices break static arbitrage bounds; ✓ marks structures whose legs all have real recorded quotes.</div>
+
+<h2 id="recorder">15. Option quote recording</h2>
+<p>In the settings, under <b>Option quote recording</b>, click <b>Turn on</b>. While the server runs (in the Store version – while the app is open), every 5 min (see <code>CR_RECORD_INTERVAL</code>) it records the real Bid / Ask, sizes, mark and IV of Bybit (BTC, ETH) and Deribit (BTC, ETH, USDC) options to <code>data/recorder</code> (~20 MB per day). The state is kept across server restarts. Later the replay of those days uses the real Bid / Ask (the latest snapshot, if it is at most two intervals old, or 10 min for short intervals), and the chain header shows "real Bid/Ask (recorded)".</p>
+
+<h2 id="settings">16. Settings</h2>
+<table>
+  <tr><th>Setting</th><th>Default</th><th>Meaning</th></tr>
+  <tr><td>Starting balance (USDT/USDC)</td><td>10,000</td><td>For linear and spot accounts.</td></tr>
+  <tr><td>Starting balance, inverse (BTC/ETH)</td><td>1</td><td>For inverse accounts and Deribit coin-settled options.</td></tr>
+  <tr><td>Leverage</td><td>10×</td><td>Capped by the instrument maximum; spot is always 1×.</td></tr>
+  <tr><td>Maintenance margin MMR</td><td>0.5 %</td><td>Share of the position value at which it is liquidated.</td></tr>
+  <tr><td>Maker / Taker fee</td><td>from the instrument</td><td>"Instrument fees" restores the exchange rates.</td></tr>
+  <tr><td>Slippage</td><td>0 bps</td><td>Extra unfavourable price shift for taker orders (1 bps = 0.01 %).</td></tr>
+  <tr><td>Latency</td><td>0 ms</td><td>Time from placing an order to its activation.</td></tr>
+  <tr><td>Limit fills</td><td>through</td><td>Through / touch / queue (see <a href="#fills">section 9</a>).</td></tr>
+  <tr><td>Option spread ±</td><td>1.5 %</td><td>Distance of synthetic Bid/Ask from the mark.</td></tr>
+  <tr><td>Apply funding payments</td><td>on</td><td>Perpetual funding.</td></tr>
+  <tr><td>Option strike lines on the chart</td><td>on</td><td>Strike, break-even, TP and SL lines.</td></tr>
+  <tr><td>Day separators on the chart</td><td>on</td><td>Vertical lines at the start of each day.</td></tr>
+</table>
+<p><b>Save</b> – fees, leverage, slippage, latency and the other parameters apply at once. A new starting balance takes effect with <b>Save and reset account</b>.</p>
+
+<h2 id="keys">17. Keyboard and mouse</h2>
+<table>
+  <tr><th>Action</th><th>Key / mouse</th></tr>
+  <tr><td>Play / pause</td><td><kbd>Space</kbd></td></tr>
+  <tr><td>Candle forward</td><td><kbd>→</kbd></td></tr>
+  <tr><td>Market buy / sell</td><td><kbd>B</kbd> / <kbd>S</kbd></td></tr>
+  <tr><td>Close position</td><td><kbd>X</kbd></td></tr>
+  <tr><td>Help mode</td><td><kbd>F1</kbd></td></tr>
+  <tr><td>Cancel the drawing tool or selection; close a window</td><td><kbd>Esc</kbd></td></tr>
+  <tr><td>Delete / lock the selected line</td><td><kbd>Delete</kbd> / <kbd>L</kbd></td></tr>
+  <tr><td>Horizontal line; copy of a line</td><td><kbd>Shift</kbd>; <kbd>Ctrl</kbd> + drag</td></tr>
+  <tr><td>Price into the Limit / Stop field</td><td>click on the chart</td></tr>
+  <tr><td>Default price scale; default size</td><td>double-click on the price axis; on a splitter</td></tr>
+</table>
+<p>Shortcuts do not work while the cursor is in a text field.</p>
+
+<h2 id="lang">18. Language, help and guide</h2>
+<ul>
+  <li><b>Language</b> – the LT / EN / RU picker at the right of the top bar. The first time, the language follows the browser language (English for any other). Changing it reloads the page: loaded data and the replay start over, settings and drawings are kept.</li>
+  <li><b>? Help</b> (<kbd>F1</kbd>) – when on, hovering over any field, button, column or row shows an explanation.</li>
+  <li><b>📖</b> opens this guide in the selected language.</li>
+</ul>
+
+<h2 id="limits">19. Data sources and limitations</h2>
+<table>
+  <tr><th>Data</th><th>Source</th></tr>
+  <tr><td>Bybit trades</td><td><code>public.bybit.com</code> daily (earlier – monthly) CSV files</td></tr>
+  <tr><td>Bybit instruments, funding, candles</td><td><code>api.bybit.com</code> (v5 API)</td></tr>
+  <tr><td>Bybit order book</td><td><code>api.cryptohftdata.com</code> (Bybit linear and spot, since mid-2025)</td></tr>
+  <tr><td>Deribit trades, instruments, options</td><td><code>history.deribit.com</code> and <code>www.deribit.com</code></td></tr>
+  <tr><td>Deribit funding and candles</td><td><code>www.deribit.com</code></td></tr>
+</table>
+<ul>
+  <li>There is no historical order book (except Bybit from CryptoHFTData), so fills are modelled from the trade tape; in the real market your order might have filled differently or not at all.</li>
+  <li>Your orders do not affect the historical price.</li>
+  <li>Without recordings, option Bid / Ask are synthetic and the mark price comes from a model.</li>
+  <li>Bybit rates are VIP0, because your own rates cannot be read without an API key.</li>
+  <li>Margin and liquidation are simplified (one position per account, mark = last price, no risk-limit tiers).</li>
+  <li>Exchange APIs can be temporarily unavailable or rate-limited – the application retries.</li>
+</ul>
+
+<h2 id="privacy">20. Privacy</h2>
+<ul>
+  <li>The application runs on your computer. No account is needed, no personal data is collected, and no telemetry or statistics are sent to the developer.</li>
+  <li>The local server contacts only the public addresses of the exchanges and data providers (see <a href="#limits">section 19</a>) to download market data. Nothing about you is sent to them apart from an ordinary network request (your IP address).</li>
+  <li>The TradingView Lightweight Charts™ library is installed with the app – no application files are loaded from the internet.</li>
+  <li>The browser's local storage (localStorage) holds only conveniences: the language, your last selection, simulation settings, drawings, window positions and sizes. Clear this site's data in the browser to remove them.</li>
+  <li>The market data cache and recorded quotes are stored in the <code>data</code> folder (or <code>CR_DATA_DIR</code>; in the Store version – in the app's data folder).</li>
+</ul>
+<p>Full <a href="privacy.html#en">privacy policy</a>.</p>
+
+<h2 id="faq">21. Troubleshooting and FAQ</h2>
+<h3>"Server unreachable"</h3>
+<p>In the Store version close and reopen the app. When running from source, run <code>start.vbs</code> (or <code>node server.js</code>) and reload the page. If the server does not start, see <code>server.log</code>: the usual causes are an outdated Node.js or another program using port 8787 (change <code>PORT</code>).</p>
+<h3>"Bybit has not published the … file yet"</h3>
+<p>A Bybit day file appears the next day around 01:00 UTC. Choose an earlier date or wait.</p>
+<h3>The first load is slow</h3>
+<p>A day is downloaded and compressed once (tens of MB for BTCUSDT). Next time it loads from the cache in a fraction of a second. Deribit trades are downloaded page by page and can take longer.</p>
+<h3>No order book</h3>
+<p>The book exists only for Bybit linear and spot instruments since mid-2025. Elsewhere orders fill against the trade tape.</p>
+<h3>No option chain</h3>
+<p>The chain appears only after loading a Deribit BTC/ETH inverse, Deribit USDC linear or Bybit BTCUSDT / ETHUSDT instrument. If there are no prices yet, start the replay – IV appears after the first option trades.</p>
+<h3>The chart scale is "stuck"</h3>
+<p>Click <b>Auto</b> or double-click the price axis; <b>⤢</b> shows the whole period.</p>
+<h3>My drawings are gone</h3>
+<p>Drawings are saved per instrument and only in this browser. Load the same instrument on the same exchange.</p>
+<h3>How do I restore all default settings?</h3>
+<p>Store version: Windows <i>Settings → Apps → Installed apps → CryptoReplayer → Advanced options → Reset</i> (this also deletes the data cache). From source: clear the data of the site <code>127.0.0.1:8787</code> in the browser – the cache in the <code>data</code> folder stays.</p>
+<h3>Does the application trade with real money?</h3>
+<p>No. It does not connect to your exchange accounts and never sends any orders.</p>
+
+<footer>CryptoReplayer · Charts: <a href="https://www.tradingview.com/">TradingView</a> Lightweight Charts™ (Apache 2.0) · <a href="privacy.html#en">Privacy policy</a><br>Bybit and Deribit are trademarks of their respective owners; this application is not affiliated with them. Simulated results are not investment advice.</footer>
+</div>
+</body>
+</html>

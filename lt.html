@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="lt">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CryptoReplayer – naudotojo vadovas</title>
+  <link rel="stylesheet" href="guide.css">
+</head>
+<body>
+<div class="wrap">
+<header class="top">
+  <h1>CryptoReplayer – naudotojo vadovas</h1>
+  <div class="langs"><a href="lt.html" aria-current="page">LT</a><a href="en.html" hreflang="en">EN</a><a href="ru.html" hreflang="ru">RU</a></div>
+</header>
+<p class="meta">Programos versija 0.1.0 · vadovas atnaujintas 2026-10-11</p>
+
+<p>CryptoReplayer – istorinių kriptovaliutų sandorių peržiūros („replay“) ir prekybos simuliacijos programa. Ji atkuria tikrą <b>Bybit</b> ir <b>Deribit</b> sandorių eigą jūsų kompiuteryje ir leidžia joje prekiauti taip, lyg rinka vyktų dabar: su komisiniais, funding mokėjimais, slydimu, vėlinimu, svertu, likvidavimu, opcionais ir kelių kojų opcionų strategijomis. Visi rinkos duomenys gaunami nemokamai, paskyros ar API raktų nereikia.</p>
+
+<div class="warn"><b>Svarbu.</b> Tai mokymosi ir strategijų tyrimo įrankis. Jokie pavedimai į biržas nesiunčiami, prekiaujama tik virtualiais pinigais. Simuliacijos rezultatai nėra garantija, kad tokie pat būtų tikroje rinkoje, ir nėra investavimo patarimas.</div>
+
+<nav class="toc"><b>Turinys</b>
+<ol>
+  <li><a href="#start">Reikalavimai ir paleidimas</a></li>
+  <li><a href="#quick">Greita pradžia</a></li>
+  <li><a href="#screen">Ekrano apžvalga</a></li>
+  <li><a href="#load">Duomenų įkėlimas</a></li>
+  <li><a href="#replay">Replay valdymas</a></li>
+  <li><a href="#charts">Grafikai</a></li>
+  <li><a href="#draw">Piešimo įrankiai</a></li>
+  <li><a href="#trade">Prekyba</a></li>
+  <li><a href="#fills">Kaip vykdomi pavedimai</a></li>
+  <li><a href="#account">Sąskaita, marža, mokesčiai</a></li>
+  <li><a href="#tabs">Apatinės kortelės ir CSV</a></li>
+  <li><a href="#options">Opcionai</a></li>
+  <li><a href="#builder">Strategijų konstruktorius</a></li>
+  <li><a href="#scanner">Skeneris</a></li>
+  <li><a href="#recorder">Opcionų kotiruočių įrašymas</a></li>
+  <li><a href="#settings">Nustatymai</a></li>
+  <li><a href="#keys">Klaviatūra ir pelė</a></li>
+  <li><a href="#lang">Kalba, pagalba ir vadovas</a></li>
+  <li><a href="#limits">Duomenų šaltiniai ir apribojimai</a></li>
+  <li><a href="#privacy">Privatumas</a></li>
+  <li><a href="#faq">Trikčių šalinimas ir DUK</a></li>
+</ol>
+</nav>
+
+<h2 id="start">1. Reikalavimai ir paleidimas</h2>
+<h3>Microsoft Store versija</h3>
+<p>Įdiekite CryptoReplayer iš Microsoft Store ir paleiskite iš meniu „Start“. Nieko daugiau diegti nereikia – Node.js ir naršyklės variklis yra programos viduje. Reikia Windows 10 (2004) ar naujesnės, 64 bitų.</p>
+<ul>
+  <li>Duomenų kešas, įrašytos kotiruotės ir techninis žurnalas (<code>logs\server.log</code>) saugomi programos duomenų aplanke, kurį Windows ištrina pašalinus programą.</li>
+  <li>Programa naudoja vietinį prievadą 47821 (jei užimtas – kitą laisvą); jis pasiekiamas tik iš jūsų kompiuterio.</li>
+  <li>Mastelį keičia <kbd>Ctrl</kbd>+<kbd>+</kbd> / <kbd>Ctrl</kbd>+<kbd>−</kbd> / <kbd>Ctrl</kbd>+<kbd>0</kbd>, viso ekrano režimą – <kbd>F11</kbd>.</li>
+</ul>
+<h3>Versija iš šaltinio kodo</h3>
+<ul>
+  <li><b>Operacinė sistema:</b> Windows 10 / 11 (paleidikliai <code>start.vbs</code> ir <code>stop.vbs</code>). Serverį galima paleisti ir macOS ar Linux sistemose komanda <code>node server.js</code>.</li>
+  <li><b>Node.js 22.15 ar naujesnis</b> (<a href="https://nodejs.org">nodejs.org</a>). Pirmą kartą programos aplanke paleiskite <code>npm install</code>.</li>
+  <li><b>Naršyklė:</b> naujausia Chrome, Edge arba Firefox.</li>
+  <li><b>Interneto ryšys</b> – istoriniams duomenims parsiųsti. Jau parsiųstos dienos įkeliamos iš disko.</li>
+</ul>
+<h3>Paleidimas Windows sistemoje</h3>
+<ol>
+  <li>Dukart spustelėkite <code>start.vbs</code>. Serveris pasileidžia fone, be konsolės lango, ir naršyklėje atsidaro <code>http://127.0.0.1:8787</code>. Jei serveris jau veikia, tik atidaroma naršyklė.</li>
+  <li>Serverį sustabdo <code>stop.vbs</code> (sustabdomas tik šio aplanko serveris). Žurnalas rašomas į <code>server.log</code>.</li>
+</ol>
+<p>Rankiniu būdu: <code>node server.js</code>, tada naršyklėje atidarykite <code>http://127.0.0.1:8787</code>. Serveris klauso tik vietinio kompiuterio adreso.</p>
+<h3>Nustatymai aplinkos kintamaisiais arba faile <code>.env</code></h3>
+<p>Faile <code>.env</code> (programos aplanke, pavyzdys – <code>.env.example</code>) arba aplinkos kintamaisiais:</p>
+<table>
+  <tr><th>Kintamasis</th><th>Numatyta</th><th>Paskirtis</th></tr>
+  <tr><td><code>PORT</code></td><td>8787</td><td>Serverio prievadas. Jį pakeitus, pakeiskite ir <code>PORT</code> faile <code>start.vbs</code>.</td></tr>
+  <tr><td><code>HOST</code></td><td>127.0.0.1</td><td>Adresas, kurio klauso serveris.</td></tr>
+  <tr><td><code>CR_DATA_DIR</code></td><td><code>./data</code></td><td>Duomenų kešo aplankas. Bybit BTCUSDT viena diena užima ~5 MB, todėl jį verta laikyti ne sinchronizuojamame (OneDrive ir pan.) aplanke.</td></tr>
+  <tr><td><code>CHD_API_KEY</code></td><td>–</td><td>Nebūtinas CryptoHFTData raktas. Be jo leidžiama 60 order book failų per minutę.</td></tr>
+  <tr><td><code>CR_RECORD</code></td><td>–</td><td><code>1</code> – įjungti opcionų kotiruočių įrašymą paleidžiant serverį.</td></tr>
+  <tr><td><code>CR_RECORD_INTERVAL</code></td><td>300</td><td>Įrašymo intervalas sekundėmis.</td></tr>
+</table>
+<h3>Duomenų kešas</h3>
+<p>Kiekviena parsiųsta diena išsaugoma <code>data/&lt;birža&gt;/&lt;tipas&gt;/&lt;simbolis&gt;/&lt;data&gt;.crt.gz</code> ir kitą kartą įkeliama per sekundės dalį. Kešą galima bet kada ištrinti – reikalingi duomenys bus parsiųsti iš naujo.</p>
+
+<h2 id="quick">2. Greita pradžia</h2>
+<ol>
+  <li>Viršutinėje juostoje pasirinkite <b>Birža</b> (pvz. Bybit), <b>Tipas</b> (Linear) ir <b>Instrumentas</b> (pvz. BTCUSDT).</li>
+  <li>Nurodykite <b>Prekyba nuo (UTC)</b> – dieną, nuo kurios prekiausite, ir <b>Dienų</b> skaičių. Jei norite matyti ankstesnę istoriją, ankstesnę datą nurodykite lauke <b>Apšilimas nuo (UTC)</b>.</li>
+  <li>Spauskite <b>Įkelti</b>. Pirmą kartą diena parsiunčiama (būsenos eilutėje matysite eigą), vėliau įkeliama iš kešo.</li>
+  <li>Spauskite <b>▶</b> arba <kbd>Tarpas</kbd>. Greitį keiskite sąraše <b>Greitis</b>.</li>
+  <li>Dešinėje kortelėje <b>Pavedimas</b> įveskite kiekį ir spauskite <b>Pirkti / Long</b> arba <b>Parduoti / Short</b> (arba klavišus <kbd>B</kbd> / <kbd>S</kbd>).</li>
+  <li>Poziciją, PnL ir sąskaitą stebėkite kortelėse <b>Sąskaita</b> ir <b>Pozicijos</b>, uždarykite mygtuku <b>Uždaryti</b> arba <kbd>X</kbd>.</li>
+  <li>Rezultatus peržiūrėkite kortelėse <b>Sandoriai</b>, <b>Įvykdymai</b> ir <b>Kapitalo kreivė</b>; eksportuokite <b>Eksportuoti CSV</b>.</li>
+  <li>Nežinote, ką reiškia laukelis ar stulpelis? Paspauskite <kbd>F1</kbd> ir užveskite pelę – pamatysite paaiškinimą.</li>
+</ol>
+
+<h2 id="screen">3. Ekrano apžvalga</h2>
+<table>
+  <tr><th>Sritis</th><th>Kas joje</th></tr>
+  <tr><td>Viršutinė juosta</td><td>Birža, tipas, instrumentas, „pasibaigę“ (Deribit), apšilimo ir prekybos datos, dienų skaičius, <b>Įkelti</b>, būsenos eilutė, <b>⚙ Nustatymai</b>, <b>? Pagalba</b>, <b>📖</b> (šis vadovas) ir kalbos pasirinkimas.</td></tr>
+  <tr><td>Transporto juosta</td><td>⏮ į pradžią, ▶/⏸, ⏭ žvakė į priekį, greitis, grafikų išdėstymas, piešimo įrankiai, vaizdai <b>Grafikas</b> / <b>Opcionų grandinė</b> (kai yra opcionų), laiko juosta, laikrodis ir laiko zona.</td></tr>
+  <tr><td>Grafikai</td><td>Vienas arba du kainos grafikai su savo intervalais. Kiekvieno kampe – intervalo pasirinkimas, legenda ir mygtukai ⤢, Log, Auto.</td></tr>
+  <tr><td>Dešinė juosta</td><td>Pavedimo forma (arba opciono forma, kai pasirinktas opcionas), Order book (Bybit, kai yra duomenų) ir Sąskaita.</td></tr>
+  <tr><td>Apatinė juosta</td><td>Kortelės Pozicijos, Pavedimai, Įvykdymai, Sandoriai, Strategijos, Įvykiai, Sandorių juosta, Kapitalo kreivė ir CSV eksportas.</td></tr>
+</table>
+<p>Dešinės juostos korteles galima suskleisti spustelėjus jų antraštę, apatinę juostą – mygtuku su rodykle. Skirtukus tarp grafikų ir tarp grafikų bei apatinės juostos galima tempti; dvigubas spustelėjimas grąžina numatytąjį dydį. Visa tai įsimenama šioje naršyklėje.</p>
+
+<h2 id="load">4. Duomenų įkėlimas</h2>
+<h3>Biržos ir kontraktų tipai</h3>
+<table>
+  <tr><th>Birža</th><th>Tipas</th><th>Kas tai</th></tr>
+  <tr><td>Bybit</td><td>Linear (USDT/USDC)</td><td>Perpetual ir ateities sandoriai, kiekis bazine moneta, PnL ir mokesčiai USDT/USDC. Sandoriai nuo 2020 m.</td></tr>
+  <tr><td>Bybit</td><td>Inverse (monetomis)</td><td>Kiekis USD kontraktais, PnL ir mokesčiai monetomis (BTC, ETH…).</td></tr>
+  <tr><td>Bybit</td><td>Spot</td><td>Be sverto ir be short pozicijų. Iki ~2022-11-10 duomenys yra tik mėnesiniuose failuose – vienas parsiuntimas suskaidomas į daug dienų.</td></tr>
+  <tr><td>Deribit</td><td>Inverse BTC/ETH</td><td>BTC ir ETH perpetual ir ateities sandoriai (atsiskaitomi monetomis) ir BTC/ETH opcionai.</td></tr>
+  <tr><td>Deribit</td><td>Linear USDC</td><td>USDC perpetual (pvz. <code>SOL_USDC-PERPETUAL</code>) ir USDC opcionai BTC, ETH, SOL, XRP, AVAX, HYPE, TRX.</td></tr>
+</table>
+<h3>Laukai</h3>
+<ul>
+  <li><b>Instrumentas</b> – spustelėkite, kad matytumėte visą sąrašą; rašykite, kad jį filtruotumėte. Rodomi tik instrumentai, kuriems yra nemokamų duomenų. Pasirinkus instrumentą būsenos eilutėje matyti, nuo kada iki kada yra duomenų.</li>
+  <li><b>pasibaigę</b> (Deribit) – į sąrašą įtraukti jau pasibaigusius ateities sandorius.</li>
+  <li><b>Apšilimas nuo (UTC)</b> – nuo kada grafike rodoma istorija prieš prekybą. Ji imama iš biržų kline API, tik piešiama, prekiauti joje negalima. Aukštesniems intervalams automatiškai rodoma bent ~200 žvakių, bet ne daugiau kaip metai atgal.</li>
+  <li><b>Prekyba nuo (UTC)</b> ir <b>Dienų</b> (1–14) – laikotarpis, kurį peržiūrite su tikrais sandoriais.</li>
+</ul>
+<p>Paspaudus <b>Įkelti</b> parsiunčiami sandoriai, funding istorija, apšilimo žvakės, Bybit order book (jei yra) ir opcionų duomenys (jei instrumentas jų turi). Sąskaita atstatoma, replay pradedamas nuo pirmo sandorio.</p>
+<div class="note"><b>Duomenų prieinamumas.</b> Bybit dienos failas paskelbiamas kitą dieną apie 01:00 UTC, todėl šiandienos Bybit duomenų nėra. Deribit leidžia įkelti ir šiandienos (dar nepilnus) duomenis – jie nekešuojami. Visos datos – UTC paros.</div>
+
+<h2 id="replay">5. Replay valdymas</h2>
+<ul>
+  <li><b>▶ / ⏸</b> (<kbd>Tarpas</kbd>) – paleisti / sustabdyti.</li>
+  <li><b>⏭</b> (<kbd>→</kbd>) – iki dabartinės žvakės pabaigos; žingsnis – mažiausias matomų grafikų intervalas.</li>
+  <li><b>⏮</b> – į laikotarpio pradžią (sąskaita atstatoma).</li>
+  <li><b>Greitis</b> – nuo 1× iki 10000× realaus laiko; 60× reiškia vieną minutę per sekundę.</li>
+  <li><b>Laiko juosta</b> – tempkite pirmyn, kad prasuktumėte laiką (pavedimai vykdomi pakeliui), arba atgal (sąskaita atstatoma, programa paprašo patvirtinimo).</li>
+  <li><b>Laikrodis</b> rodo dabartinį replay momentą. Viskas – grafikai, kainos, PnL – rodoma tik iki šio momento.</li>
+  <li><b>Laikas</b> – laiko zona, kuria rodomi visi laikai: UTC, Vilnius, Londonas, Berlynas, Niujorkas, Singapūras, Tokijas arba kompiuterio zona. Vasaros / žiemos laikas perjungiamas automatiškai. Datų laukai ir CSV eksportas lieka UTC.</li>
+</ul>
+
+<h2 id="charts">6. Grafikai</h2>
+<ul>
+  <li><b>Grafikai: 2 greta</b> – du grafikai (pagal nutylėjimą kairėje 1D, dešinėje 15 min); <b>1</b> – tik dešinysis. Abu sinchronizuoti: tas pats replay laikas, pozicijos, pavedimai ir piešiniai.</li>
+  <li><b>Intervalas</b> (kiekvieno grafiko kampe): 1s, 5s, 15s, 1m, 5m, 15m, 1h, 4h, 1D. Žvakės perskaičiuojamos iš sandorių, niekas neprarandama.</li>
+  <li><b>Legenda</b> – A (atidarymo), Aukšt, Žem, U (uždarymo) kainos ir pokytis; užvedus pelę rodoma ta žvakė.</li>
+  <li><b>Mastelis:</b> pelės ratukas grafike – laiko mastelis; ratukas ant kainų ašies – kainų mastelis; ratukas ant laiko ašies – laiko mastelis aplink žymeklį; ašis galima tempti. <b>Auto</b> arba dvigubas spustelėjimas ant kainų ašies grąžina automatinį mastelį, <b>⤢</b> parodo visą laikotarpį, <b>Log</b> įjungia logaritminę skalę (pagal nutylėjimą įjungta).</li>
+  <li><b>Žymės grafike:</b> rodyklės – jūsų įvykdymai; ištisinė linija – pozicijos įėjimas (long žalia, short raudona); oranžinė taškinė – likvidavimo kaina; brūkšninės – laukiantys pavedimai (TP oranžinė, SL violetinė, su tikėtinu PnL). Opcionai rodomi strike, break-even, TP ir SL linijomis (žr. <a href="#options">Opcionai</a>).</li>
+  <li><b>Dienų skirtukai</b> – mėlynos punktyrinės vertikalios linijos ties kiekvienos dienos pradžia pasirinktoje laiko zonoje (išjungiama nustatymuose).</li>
+  <li><b>Spustelėjimas grafike</b> (be aktyvaus piešimo įrankio) įrašo tą kainą į Limit lauką (rinkos pavedimą perjungia į Limit) arba į Stop lauką.</li>
+</ul>
+
+<h2 id="draw">7. Piešimo įrankiai</h2>
+<p>Transporto juostoje <b>Piešti</b>: ╱ trendo linija ir ↗ spindulys (du paspaudimai), ― horizontali ir │ vertikali linija (vienas paspaudimas), spalva, linijos tipas (ištisinė, brūkšninė, taškinė), storis (1–4 px), 🔒 užrakinimas, ⌫ trintukas ir 🗑 ištrinti visas.</p>
+<ul>
+  <li>Linijos saugomos laiku ir kaina, todėl matomos abiejuose grafikuose; jos įsimenamos kiekvienam instrumentui atskirai šioje naršyklėje.</li>
+  <li>Be aktyvaus įrankio: spustelėkite liniją – ji pasirenkama; tempkite – perkeliama; tempkite galo rankenėlę – keičiamas tas galas; <kbd>Ctrl</kbd> + tempti – tempiama kopija (originalas lieka); <kbd>Delete</kbd> – ištrinti; <kbd>L</kbd> arba 🔒 – užrakinti / atrakinti.</li>
+  <li><kbd>Shift</kbd> dedant antrą tašką arba tempiant galą – linija tiksliai horizontali. Prie trendo linijos ir spindulio pradžios rodomas kampas ekrane.</li>
+  <li>Užrakintos linijos negalima pajudinti ar ištrinti (net trintuku ar „ištrinti visas“). <kbd>Esc</kbd> atšaukia įrankį arba pasirinkimą.</li>
+</ul>
+
+<h2 id="trade">8. Prekyba</h2>
+<h3>Pavedimo forma</h3>
+<ul>
+  <li><b>Rinkos</b> – įvykdomas iš karto (taker mokestis). <b>Limit</b> – laukia nurodytos ar geresnės kainos (maker mokestis). <b>Stop</b> – pasiekus trigger kainą tampa rinkos pavedimu.</li>
+  <li><b>Kiekis</b> – instrumento vienetais: linear ir spot – bazine moneta, inverse – USD kontraktais. Apvalinamas iki leistino žingsnio. Mygtukai 10 % / 25 % / 50 % / 100 % užpildo kiekį pagal laisvą maržą ir svertą.</li>
+  <li><b>Take profit / Stop loss</b> – įvykdžius pavedimą automatiškai pateikiami priešingi „tik mažinti“ pavedimai (TP – limit, SL – stop). Jie veikia kaip OCO: įvykdžius vieną, kitas atšaukiamas.</li>
+  <li><b>TP/SL vienetai:</b> <b>Kaina</b> – absoliuti kaina; <b>%</b> – kainos pokytis nuo įėjimo; <b>$ P&amp;L</b> – pelnas / nuostolis doleriais visam pavedimui. Įvedami teigiami skaičiai – kryptį nulemia Pirkti / Parduoti. Po laukeliais matote gaunamas kainas ir PnL.</li>
+  <li><b>Tik mažinti</b> – pavedimas gali tik sumažinti ar uždaryti poziciją. <b>Post-only</b> (limit) – atmetamas, jei būtų įvykdytas iš karto.</li>
+  <li><b>Įvertis</b> – pavedimo vertė, marža, mokestis ir didžiausias galimas kiekis.</li>
+</ul>
+<p>Spartieji klavišai: <kbd>B</kbd> – rinkos pirkimas, <kbd>S</kbd> – rinkos pardavimas, <kbd>X</kbd> – uždaryti poziciją rinkos kaina.</p>
+<h3>Atidarytos pozicijos TP/SL</h3>
+<p>Kortelėje <b>Pozicijos</b> spauskite <b>TP/SL</b>: atsidaro langas, kuriame TP ir SL nurodomi kaina, % arba $ nuo įėjimo, matote peržiūrą ir galite juos pašalinti. TP/SL apima visą poziciją ir veikia kaip OCO; nustačius iš naujo seni pakeičiami.</p>
+
+<h2 id="fills">9. Kaip vykdomi pavedimai</h2>
+<p>Nei Bybit, nei Deribit nemokamai neteikia order book istorijos, todėl pavedimai vykdomi pagal <b>sandorių juostą</b> (tikrus istorinius sandorius):</p>
+<ul>
+  <li><b>Vėlinimas:</b> pavedimas tampa aktyvus tik praėjus nustatytam milisekundžių skaičiui nuo pateikimo.</li>
+  <li><b>Rinkos ir stop pavedimai</b> įvykdomi pirmu sandoriu po aktyvavimo, jo kaina plius nustatytas slydimas (bps). Jei yra Bybit order book (CryptoHFTData, nuo 2025 m. vidurio), rinkos pavedimas „suvalgo“ knygos lygius ir gauna vidutinę kainą.</li>
+  <li><b>Limit pavedimai</b> įvykdomi savo kaina su maker mokesčiu pagal pasirinktą režimą: <b>perėjimas</b> – sandoris turi įvykti geresne kaina nei limitas (numatyta, konservatyvu); <b>palietimas</b> – užtenka sandorio ties limitu (optimistiška); <b>eilė</b> – įvykdoma, kai prieš jus knygoje stovėjęs kiekis prasuktas sandoriais (reikia order book).</li>
+  <li>Jei limit kaina pateikimo metu jau pasiekta, pavedimas įvykdomas iš karto kaip <b>taker</b>.</li>
+  <li>Kai replay sustabdytas, rinkos pavedimas įvykdomas iš karto – juosta prasukama iki artimiausio sandorio.</li>
+</ul>
+
+<h2 id="account">10. Sąskaita, marža ir mokesčiai</h2>
+<table>
+  <tr><th>Tipas</th><th>Kiekis</th><th>PnL, mokesčiai, marža</th></tr>
+  <tr><td>Linear</td><td>bazine moneta</td><td>kotiruojama valiuta (USDT/USDC)</td></tr>
+  <tr><td>Inverse</td><td>USD kontraktais</td><td>monetomis; PnL = kiekis · (1/įėjimas − 1/išėjimas), įėjimo kaina – harmoninis vidurkis</td></tr>
+  <tr><td>Spot</td><td>bazine moneta</td><td>kaip linear, bet svertas 1×, be short; pardavimai visada „tik mažinti“, funding netaikomas</td></tr>
+</table>
+<ul>
+  <li><b>Mokestis</b> = pavedimo vertė × tarifas. Maker – laukiantiems limit pavedimams; taker – rinkos, stop, iš karto įvykdomiems limit pavedimams ir likvidavimams. Įkėlus instrumentą tarifai nustatomi automatiškai: Deribit – iš API, Bybit – VIP0 (linear / inverse 0,02 % / 0,055 %, spot 0,1 % / 0,1 %). Savo tarifą galite įrašyti nustatymuose.</li>
+  <li><b>Funding</b> (perpetual) – teigiama norma: long moka short. Mokėjimas = pozicijos vertė pagal paskutinę kainą × norma. Bybit – pagal biržos funding laikus, Deribit – kas valandą (<code>interest_1h</code>).</li>
+  <li><b>Marža</b> = pozicijos vertė / svertas. <b>Likvidavimas:</b> kai kapitalas nukrenta iki palaikymo maržos (pozicijos vertė × MMR, plius opcionų palaikymo marža), atšaukiami visi pavedimai, pozicija uždaroma rinkos kaina su taker mokesčiu, opcionai – mark kaina.</li>
+  <li><b>Mark kaina</b> PnL ir likvidavimui – paskutinio sandorio kaina.</li>
+</ul>
+<h3>Sąskaitos kortelė</h3>
+<p>Kapitalas (piniginė + nerealizuotas PnL + opcionų vertė), Piniginė, Laisva marža, Realizuotas PnL, Komisiniai, Funding, Grynasis PnL (ir %), Max drawdown, Sandoriai / laimėta, Profit factor, Apyvarta, Likvidavimai; turint opcionų – Opcionų vertė, Opcionų IM ir Delta. Apačioje – šiuo metu taikomi parametrai. <b>Atstatyti</b> grąžina pradinį balansą ir išvalo istoriją.</p>
+
+<h2 id="tabs">11. Apatinės kortelės ir CSV</h2>
+<table>
+  <tr><th>Kortelė</th><th>Turinys</th></tr>
+  <tr><td>Pozicijos</td><td>Atidaryta Spot/Futures pozicija: dydis, įėjimas, paskutinė kaina, Max / Min nuo atidarymo (su laiku), nerealizuotas ir geriausias PnL, likvidavimo kaina ir marža, komisiniai ir funding, TP/SL, mygtukai <b>TP/SL</b> ir <b>Uždaryti</b>. Kai įkelta opcionų grandinė – ir skyrius Opcionai.</td></tr>
+  <tr><td>Pavedimai</td><td>Laukiantys pavedimai (RO – tik mažinti, PO – post-only) su mygtuku <b>Atšaukti</b>.</td></tr>
+  <tr><td>Įvykdymai</td><td>Kiekvienas įvykdymas: laikas, kryptis, kiekis, kaina, tipas, likvidumas (maker / taker / likvidavimas / išpirkimas), mokestis, realizuotas PnL.</td></tr>
+  <tr><td>Sandoriai</td><td>Uždarytos pozicijos nuo atidarymo iki pilno uždarymo: įėjimas, išėjimas, Max / Min kol laikėte, Max / Min po uždarymo (Spot/Futures – iki dabartinio replay laiko, opcionams – iki galiojimo pabaigos), geriausias P&amp;L, bruto PnL, komisiniai, funding, grynasis. Palankus kraštutinumas paryškintas geltonai.</td></tr>
+  <tr><td>Strategijos</td><td>Konstruktoriumi atidarytos opcionų strategijos su dabartiniu P&amp;L ir mygtuku <b>Uždaryti</b>.</td></tr>
+  <tr><td>Įvykiai</td><td>Funding mokėjimai, atšaukimai, atmetimai, opcionų išpirkimai ir TP/SL suveikimai, likvidavimai.</td></tr>
+  <tr><td>Sandorių juosta</td><td>Paskutiniai 60 rinkos sandorių; agresorius – pirkėjas (žalia) arba pardavėjas (raudona).</td></tr>
+  <tr><td>Kapitalo kreivė</td><td>Kapitalas laike.</td></tr>
+</table>
+<p><b>Eksportuoti CSV</b> atsisiunčia įvykdymus, o jei atidaryta kortelė <b>Sandoriai</b> arba <b>Pozicijos</b> – uždarytus sandorius su Max / Min stulpeliais. Laikai CSV faile – UTC, stulpelių pavadinimai – angliški.</p>
+
+<h2 id="options">12. Opcionai</h2>
+<p>Opcionų grandinė atsiranda įkėlus vieną iš šių instrumentų. Visų trijų kainos ir IV skaičiuojamos iš Deribit opcionų sandorių – tai vienintelė nemokama opcionų istorija.</p>
+<table>
+  <tr><th>Įkeltas instrumentas</th><th>Opcionai</th><th>Taisyklės</th></tr>
+  <tr><td>Deribit inverse BTC/ETH (pvz. <code>BTC-PERPETUAL</code>)</td><td>BTC, ETH; premija monetomis</td><td>1 kontraktas = 1 moneta (min. 0,1); mokestis 0,03 % kontraktui, ne daugiau 12,5 % premijos</td></tr>
+  <tr><td>Deribit linear USDC (pvz. <code>SOL_USDC-PERPETUAL</code>)</td><td>BTC, ETH, SOL, XRP, AVAX, HYPE, TRX; kaina USDC</td><td>kontrakto dydis ir kainos žingsnis pagal turtą (pvz. BTC 0,01, SOL 10, XRP 1000)</td></tr>
+  <tr><td>Bybit linear BTCUSDT / ETHUSDT</td><td>BTC, ETH; kaina USDT</td><td>Bybit: min. 0,01 BTC / 0,1 ETH, žingsnis 5 / 0,1 USDT, mokestis 0,03 % indekso, ne daugiau 7 % premijos; dieniniams opcionams išpirkimo mokesčio nėra</td></tr>
+</table>
+<h3>Grandinė</h3>
+<ul>
+  <li>Vaizdas <b>Opcionų grandinė</b> rodo visus tuo replay momentu galiojančius strike'us pasirinktai galiojimo datai: pozicija, paskutinis tikras sandoris, delta, IV, Bid ir Ask (call – kairėje, put – dešinėje).</li>
+  <li><b>Mark</b> kaina skaičiuojama Black-76 modeliu pagal IV šypseną iš paskutinių Deribit mark IV; forward – iš Deribit kainų. Pasviręs IV reiškia, kad šiai datai sandorių dar nebuvo ir IV paimtas iš artimiausios datos.</li>
+  <li><b>Bid / Ask yra sintetiniai:</b> mark ± spread (numatyta 1,5 %, keičiama nustatymuose), nes istorinės opcionų knygos nėra. Jei tai dienai yra įrašytų tikrų kotiruočių (žr. <a href="#recorder">įrašymą</a>), naudojamos jos.</li>
+  <li>Mėlynas fonas – ITM, oranžinė linija – ties forward kaina. Antraštėje – indeksas, forward, likęs laikas, ATM IV ir spread.</li>
+</ul>
+<h3>Prekyba opcionais</h3>
+<ul>
+  <li>Spustelėkite <b>Ask</b> (pirkti) arba <b>Bid</b> (parduoti) – dešinėje atsidaro opciono forma. Rinkos pavedimas įvykdomas iš karto (pirkimas už Ask, pardavimas už Bid); limit – kai sintetinė kaina pasiekia jūsų kainą.</li>
+  <li><b>Short opcionų marža</b> (Deribit standartinė): pradinė – max(0,15 − OTM/S, 0,1) + mark, palaikymo – 0,075 + mark (kiekvienam kontraktui, indekso dalimis).</li>
+  <li><b>Išpirkimas</b> – galiojimo dieną 08:00 UTC pagal indeksą; išpirkimo mokestis min(0,015 % kiekio, 12,5 % vidinės vertės).</li>
+  <li><b>TP/SL opcionams</b> – opciono kainos lygiai; suveikia pagal mark kainą ir uždaro visą poziciją rinkos pavedimu. Vienetai: kaina, % premijos arba $.</li>
+  <li><b>Linijos grafike</b> (kaip ChromOptions): strike linija nuo atidarymo iki galiojimo pabaigos (call žalia, put raudona; pirktas – ištisinė, parduotas – punktyrinė), balta break-even linija, TP (oranžinė) ir SL (violetinė) ties apytiksle bazinio turto kaina.</li>
+  <li><b>Max / Min</b> – opciono mark kainos kraštutinumai, kol pozicija atidaryta, ir toliau iki galiojimo pabaigos (tikrinama kas ≤ 60 s replay laiko).</li>
+  <li>Perpetual ir opcionai naudoja tą pačią sąskaitą, todėl galima hedžuoti; rodoma portfelio delta. Spot sąskaitoje opcionai negalimi.</li>
+</ul>
+
+<h2 id="builder">13. Strategijų konstruktorius</h2>
+<p>Grandinėje spauskite <b>🧩 Strategijų konstruktorius</b>. Šablonai: vertikalus spredas, butterfly, iron condor, riskless butterfly, riskless iron condor, collar / conversion, box spredas. Pasirinkite variantą, galiojimą, strike'us ir kiekį.</p>
+<ul>
+  <li>Matote kiekvieną koją (pirkimas už Ask, pardavimas už Bid, USD vertė, mokestis), payoff diagramą galiojimo pabaigoje ir rodiklius: premiją, mokesčius, blogiausią ir geriausią P&amp;L (su išpirkimo mokesčiais), break-even, apytikslį kapitalą, ROI ir APR.</li>
+  <li>Hedge koja <b>U</b> – įkeltas instrumentas (perp / futures); jo funding ir bazė neįskaičiuoti.</li>
+  <li><b>Atidaryti strategiją</b> atidaro visas kojas rinkos kaina; jei kuri nepavyksta, jau atidarytos uždaromos. Strategija atsiranda kortelėje <b>Strategijos</b>.</li>
+  <li>Langas neblokuoja replay: kainos atnaujinamos kas sekundę, langą galima tempti už antraštės, keisti dydį ir uždaryti <kbd>Esc</kbd>.</li>
+</ul>
+
+<h2 id="scanner">14. Skeneris</h2>
+<p><b>🔍 Skeneris</b> dabartiniu replay momentu perrenka visus šablonus per ~40 artimiausių forward kainai strike'ų (iki 8 galiojimų) ir rikiuoja pagal blogiausio rezultato APR (rodoma iki 150 rezultatų). Filtrai: strategija, galiojimas, maks. dienų iki galiojimo, min. APR, „Tik be rizikos“ (blogiausias ≥ 0), „Slėpti modelio arbitražą“, „Atnaujinti replay metu“ (kas ~3 s). <b>Konstruktoriuje</b> atidaro struktūrą konstruktoriuje.</p>
+<div class="warn">Be įrašytų kotiruočių Bid/Ask yra sintetiniai, todėl „be rizikos“ ir box rezultatai dažniausiai yra modelio artefaktai. ⚠ žymi struktūras, kurių kainos pažeidžia statinio arbitražo ribas; ✓ – struktūras, kurių visos kojos turi tikras įrašytas kotiruotes.</div>
+
+<h2 id="recorder">15. Opcionų kotiruočių įrašymas</h2>
+<p>Nustatymuose skiltyje <b>Opcionų kotiruočių įrašymas</b> spauskite <b>Įjungti</b>. Kol veikia serveris (Store versijoje – kol atidaryta programa), kas 5 min. (keičiama <code>CR_RECORD_INTERVAL</code>) įrašomi tikri Bybit (BTC, ETH) ir Deribit (BTC, ETH, USDC) opcionų Bid / Ask, kiekiai, mark ir IV į <code>data/recorder</code> (~20 MB per parą). Būsena išsaugoma ir po serverio paleidimo iš naujo. Vėliau replay toms dienoms naudoja tikras Bid / Ask (imamas paskutinis įrašas, jei jis ne senesnis kaip du intervalai, o trumpiems intervalams – 10 min.), o grandinės antraštėje rodoma „tikros Bid/Ask (įrašytos)“.</p>
+
+<h2 id="settings">16. Nustatymai</h2>
+<table>
+  <tr><th>Nustatymas</th><th>Numatyta</th><th>Paaiškinimas</th></tr>
+  <tr><td>Pradinis balansas (USDT/USDC)</td><td>10 000</td><td>Linear ir spot sąskaitoms.</td></tr>
+  <tr><td>Pradinis balansas inverse (BTC/ETH)</td><td>1</td><td>Inverse sąskaitoms ir Deribit monetomis atsiskaitomiems opcionams.</td></tr>
+  <tr><td>Svertas</td><td>10×</td><td>Ribojamas instrumento maksimumu; spot – visada 1×.</td></tr>
+  <tr><td>Palaikymo marža MMR</td><td>0,5 %</td><td>Pozicijos vertės dalis, kurią pasiekus likviduojama.</td></tr>
+  <tr><td>Maker / Taker mokestis</td><td>pagal instrumentą</td><td>„Instrumento mokesčiai“ grąžina biržos tarifus.</td></tr>
+  <tr><td>Slydimas</td><td>0 bps</td><td>Papildomas nepalankus poslinkis taker pavedimams (1 bps = 0,01 %).</td></tr>
+  <tr><td>Vėlinimas</td><td>0 ms</td><td>Laikas nuo pateikimo iki aktyvavimo.</td></tr>
+  <tr><td>Limit įvykdymas</td><td>perėjimas</td><td>Perėjimas / palietimas / eilė (žr. <a href="#fills">9 skyrių</a>).</td></tr>
+  <tr><td>Opcionų spread ±</td><td>1,5 %</td><td>Sintetinių Bid/Ask atstumas nuo mark.</td></tr>
+  <tr><td>Skaičiuoti funding</td><td>įjungta</td><td>Perpetual funding mokėjimai.</td></tr>
+  <tr><td>Opcionų strike linijos grafike</td><td>įjungta</td><td>Strike, break-even, TP ir SL linijos.</td></tr>
+  <tr><td>Dienų skirtukai grafike</td><td>įjungta</td><td>Vertikalios linijos ties dienos pradžia.</td></tr>
+</table>
+<p><b>Išsaugoti</b> – mokesčiai, svertas, slydimas, vėlinimas ir kiti parametrai taikomi iš karto. Pakeistas pradinis balansas įsigalioja paspaudus <b>Išsaugoti ir atstatyti sąskaitą</b>.</p>
+
+<h2 id="keys">17. Klaviatūra ir pelė</h2>
+<table>
+  <tr><th>Veiksmas</th><th>Klavišas / pelė</th></tr>
+  <tr><td>Paleisti / stabdyti</td><td><kbd>Tarpas</kbd></td></tr>
+  <tr><td>Žvakė į priekį</td><td><kbd>→</kbd></td></tr>
+  <tr><td>Rinkos pirkimas / pardavimas</td><td><kbd>B</kbd> / <kbd>S</kbd></td></tr>
+  <tr><td>Uždaryti poziciją</td><td><kbd>X</kbd></td></tr>
+  <tr><td>Pagalbos režimas</td><td><kbd>F1</kbd></td></tr>
+  <tr><td>Atšaukti piešimo įrankį, pasirinkimą; uždaryti langą</td><td><kbd>Esc</kbd></td></tr>
+  <tr><td>Ištrinti / užrakinti pasirinktą liniją</td><td><kbd>Delete</kbd> / <kbd>L</kbd></td></tr>
+  <tr><td>Horizontali linija; linijos kopija</td><td><kbd>Shift</kbd>; <kbd>Ctrl</kbd> + tempti</td></tr>
+  <tr><td>Kaina į Limit / Stop lauką</td><td>spustelėjimas grafike</td></tr>
+  <tr><td>Numatytasis kainų mastelis; dydis</td><td>dvigubas spustelėjimas ant kainų ašies; ant skirtuko</td></tr>
+</table>
+<p>Spartieji klavišai neveikia, kol žymeklis yra teksto laukelyje.</p>
+
+<h2 id="lang">18. Kalba, pagalba ir vadovas</h2>
+<ul>
+  <li><b>Kalba</b> – pasirinkimas LT / EN / RU viršutinės juostos dešinėje. Pirmą kartą kalba parenkama pagal naršyklės kalbą (kitos kalbos atveju – anglų). Pakeitus puslapis perkraunamas: įkelti duomenys ir replay pradedami iš naujo, o nustatymai ir piešiniai išlieka.</li>
+  <li><b>? Pagalba</b> (<kbd>F1</kbd>) – įjungus, užvedus pelę ant bet kurio laukelio, mygtuko, stulpelio ar eilutės rodomas paaiškinimas.</li>
+  <li><b>📖</b> – atidaro šį vadovą pasirinkta kalba.</li>
+</ul>
+
+<h2 id="limits">19. Duomenų šaltiniai ir apribojimai</h2>
+<table>
+  <tr><th>Duomenys</th><th>Šaltinis</th></tr>
+  <tr><td>Bybit sandoriai</td><td><code>public.bybit.com</code> dienos (seniau – mėnesio) CSV failai</td></tr>
+  <tr><td>Bybit instrumentai, funding, žvakės</td><td><code>api.bybit.com</code> (v5 API)</td></tr>
+  <tr><td>Bybit order book</td><td><code>api.cryptohftdata.com</code> (Bybit linear ir spot, nuo 2025 m. vidurio)</td></tr>
+  <tr><td>Deribit sandoriai, instrumentai, opcionai</td><td><code>history.deribit.com</code> ir <code>www.deribit.com</code></td></tr>
+  <tr><td>Deribit funding ir žvakės</td><td><code>www.deribit.com</code></td></tr>
+</table>
+<ul>
+  <li>Istorinės order book knygos nėra (išskyrus Bybit iš CryptoHFTData), todėl įvykdymai modeliuojami pagal sandorių juostą; tikroje rinkoje jūsų pavedimas galėjo būti įvykdytas kitaip arba visai neįvykdytas.</li>
+  <li>Jūsų pavedimai neturi įtakos istorinei kainai.</li>
+  <li>Opcionų Bid / Ask be įrašų yra sintetiniai, mark kaina – modelio.</li>
+  <li>Bybit tarifai – VIP0, nes be API rakto jūsų tarifų gauti negalima.</li>
+  <li>Marža ir likvidavimas supaprastinti (viena pozicija sąskaitoje, mark = paskutinė kaina, be rizikos limitų lygių).</li>
+  <li>Biržų API laikinai gali būti nepasiekiami arba riboti užklausų dažnį – programa bando iš naujo.</li>
+</ul>
+
+<h2 id="privacy">20. Privatumas</h2>
+<ul>
+  <li>Programa veikia jūsų kompiuteryje. Paskyros nereikia, asmeniniai duomenys nerenkami, jokia telemetrija ar statistika kūrėjui nesiunčiama.</li>
+  <li>Vietinis serveris kreipiasi tik į viešus biržų ir duomenų tiekėjų adresus (žr. <a href="#limits">19 skyrių</a>), kad parsiųstų rinkos duomenis. Į juos nesiunčiama jokia informacija apie jus, išskyrus įprastą tinklo užklausą (IP adresą).</li>
+  <li>Grafikų biblioteka TradingView Lightweight Charts™ įdiegta kartu su programa – iš interneto jokie programos failai nekeliami.</li>
+  <li>Naršyklės vietinėje saugykloje (localStorage) laikomi tik patogumo nustatymai: kalba, paskutinis pasirinkimas, simuliacijos nustatymai, piešiniai, langų padėtis ir dydžiai. Juos ištrinsite išvalę šios svetainės duomenis naršyklėje.</li>
+  <li>Rinkos duomenų kešas ir įrašytos kotiruotės saugomi aplanke <code>data</code> (arba <code>CR_DATA_DIR</code>; Store versijoje – programos duomenų aplanke).</li>
+</ul>
+<p>Išsami <a href="privacy.html#lt">privatumo politika</a>.</p>
+
+<h2 id="faq">21. Trikčių šalinimas ir DUK</h2>
+<h3>„Serveris nepasiekiamas“</h3>
+<p>Store versijoje uždarykite ir vėl atidarykite programą. Šaltinio versijoje paleiskite <code>start.vbs</code> (arba <code>node server.js</code>) ir perkraukite puslapį. Jei serveris nepasileidžia, žr. <code>server.log</code>: dažniausia priežastis – per sena Node.js versija arba prievadą 8787 užimanti kita programa (pakeiskite <code>PORT</code>).</p>
+<h3>„Bybit dar nepaskelbė … failo“</h3>
+<p>Bybit dienos failas atsiranda kitą dieną apie 01:00 UTC. Pasirinkite ankstesnę datą arba palaukite.</p>
+<h3>Pirmas įkėlimas lėtas</h3>
+<p>Diena parsiunčiama ir suglaudinama vieną kartą (BTCUSDT – dešimtys MB). Kitą kartą ji įkeliama iš kešo per sekundės dalį. Deribit sandoriai parsiunčiami puslapiais ir gali užtrukti ilgiau.</p>
+<h3>Nėra Order book</h3>
+<p>Knyga yra tik Bybit linear ir spot instrumentams nuo 2025 m. vidurio. Kitur pavedimai vykdomi pagal sandorių juostą.</p>
+<h3>Nėra opcionų grandinės</h3>
+<p>Grandinė atsiranda tik įkėlus Deribit BTC/ETH inverse, Deribit USDC linear arba Bybit BTCUSDT / ETHUSDT instrumentą. Jei kainų dar nėra, paleiskite replay – IV atsiranda po pirmų opcionų sandorių.</p>
+<h3>Grafiko mastelis „užstrigo“</h3>
+<p>Spauskite <b>Auto</b> arba dukart spustelėkite kainų ašį; <b>⤢</b> parodo visą laikotarpį.</p>
+<h3>Dingo piešiniai</h3>
+<p>Piešiniai saugomi kiekvienam instrumentui atskirai ir tik šioje naršyklėje. Įkelkite tą patį instrumentą toje pačioje biržoje.</p>
+<h3>Kaip grąžinti visus nustatymus į numatytuosius?</h3>
+<p>Store versijoje: Windows <i>Parametrai → Programos → Įdiegtos programos → CryptoReplayer → Išplėstinės parinktys → Atstatyti</i> (ištrinamas ir duomenų kešas). Šaltinio versijoje išvalykite svetainės <code>127.0.0.1:8787</code> duomenis naršyklėje – kešas aplanke <code>data</code> lieka.</p>
+<h3>Ar programa prekiauja tikrais pinigais?</h3>
+<p>Ne. Programa nesijungia prie jūsų biržos paskyrų ir nesiunčia jokių pavedimų.</p>
+
+<footer>CryptoReplayer · Grafikai: <a href="https://www.tradingview.com/">TradingView</a> Lightweight Charts™ (Apache 2.0) · <a href="privacy.html#lt">Privatumo politika</a><br>Bybit ir Deribit yra jų savininkų prekių ženklai; programa su jomis nesusijusi. Simuliacijos rezultatai nėra investavimo patarimas.</footer>
+</div>
+</body>
+</html>
