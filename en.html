@@ -12,7 +12,7 @@
   <h1>CryptoReplayer – User guide</h1>
   <div class="langs"><a href="lt.html" hreflang="lt">LT</a><a href="en.html" aria-current="page">EN</a><a href="ru.html" hreflang="ru">RU</a></div>
 </header>
-<p class="meta">Application version 0.1.0 · guide updated 2026-10-11</p>
+<p class="meta">Application version 0.2.0 · guide updated 2026-10-20</p>
 
 <p>CryptoReplayer replays historical cryptocurrency trades and simulates trading on them. It plays back the real trade flow of <b>Bybit</b> and <b>Deribit</b> on your computer and lets you trade in it as if the market were live: with fees, funding payments, slippage, latency, leverage, liquidation, options and multi-leg option strategies. All market data is free; no account and no API keys are needed.</p>
 
@@ -96,7 +96,7 @@
   <tr><th>Area</th><th>Contents</th></tr>
   <tr><td>Top bar</td><td>Exchange, type, instrument, "expired" (Deribit), warm-up and trading dates, number of days, <b>Load</b>, status line, <b>⚙ Settings</b>, <b>? Help</b>, <b>📖</b> (this guide) and the language picker.</td></tr>
   <tr><td>Transport bar</td><td>⏮ to start, ▶/⏸, ⏭ candle forward, speed, chart layout, drawing tools, the <b>Chart</b> / <b>Option chain</b> views (when options are available), the timeline, the clock and the time zone.</td></tr>
-  <tr><td>Charts</td><td>One or two price charts with their own intervals. In the corner of each – the interval, the legend and the ⤢, Log, Auto buttons.</td></tr>
+  <tr><td>Charts</td><td>One or two price charts with their own intervals. In the corner of each – the interval, the legend and the ⛶ (full screen), ⤢, Log, Auto buttons.</td></tr>
   <tr><td>Right panel</td><td>The order form (or the option form when an option is selected), the Order book (Bybit, when data exists) and the Account.</td></tr>
   <tr><td>Bottom panel</td><td>Tabs Positions, Orders, Fills, Trades, Strategies, Events, Tape, Equity curve and the CSV export.</td></tr>
 </table>
@@ -114,10 +114,10 @@
 </table>
 <h3>Fields</h3>
 <ul>
-  <li><b>Instrument</b> – click to see the whole list; type to filter it. Only instruments with free data are listed. Once chosen, the status line shows the date range of the data.</li>
+  <li><b>Instrument</b> – click to see the whole list; type to filter it. Only instruments with free data are listed. Once chosen, the status line shows the date range of the data. <b>★</b> next to it lists the five most often loaded instruments (from all exchanges and types): click one to load it at once, × removes a row.</li>
   <li><b>expired</b> (Deribit) – include futures that have already expired.</li>
-  <li><b>Warm-up from (UTC)</b> – how far back the chart shows history before trading. It comes from the exchange kline APIs and is only drawn – you cannot trade in it. Higher intervals automatically get at least ~200 candles, but never more than one year back.</li>
-  <li><b>Trade from (UTC)</b> and <b>Days</b> (1–14) – the period you replay with real trades.</li>
+  <li><b>Warm-up from (UTC)</b> – how far back the chart shows history before trading. It comes from the exchange kline APIs and is only drawn – you cannot trade in it. The chart starts exactly at this date. Without a warm-up (the same date as "Trade from"), hourly and higher intervals automatically get ~200 candles. The warm-up reaches up to one year back, up to 6 years for days, weeks and months.</li>
+  <li><b>Trade from (UTC)</b> and <b>Days</b> (1–14) – the period you replay with real trades. Once data is loaded, changing these dates or the warm-up loads the new period automatically (with a position, orders or history you are asked first, because the account is reset).</li>
 </ul>
 <p><b>Load</b> downloads the trades, the funding history, the warm-up candles, the Bybit order book (if available) and option data (if the instrument has options). The account is reset and the replay starts from the first trade.</p>
 <div class="note"><b>Data availability.</b> Bybit publishes a day's file the next day around 01:00 UTC, so there is no Bybit data for today. Deribit allows today's (incomplete) data as well – it is not cached. All dates are UTC days.</div>
@@ -136,7 +136,8 @@
 <h2 id="charts">6. Charts</h2>
 <ul>
   <li><b>Charts: 2 side by side</b> – two charts (by default 1D on the left and 15 min on the right); <b>1</b> – only the right one. Both are synchronised: the same replay time, positions, orders and drawings.</li>
-  <li><b>Interval</b> (in the corner of each chart): 1s, 5s, 15s, 1m, 5m, 15m, 1h, 4h, 1D. Candles are rebuilt from the trades; nothing is lost.</li>
+  <li><b>Interval</b> (in the corner of each chart): 1s, 5s, 15s, 1m, 5m, 15m, 1h, 4h, 1D, 1W (week from Monday), 1M (calendar month). Candles are rebuilt from the trades; nothing is lost. In the list × removes an interval, "Add interval" at the bottom adds your own (e.g. 3 minutes, 2 hours, 2 weeks, 3 months), "Restore defaults" brings back the original list. The list is shared by both charts and remembered.</li>
+  <li><b>⛶</b> (at the bottom of each chart, key <kbd>F</kbd>) – that chart full screen (<kbd>F</kbd> – the chart under the mouse): the other chart, the top bar, the side panel and the bottom tables are hidden, the replay and drawing bar stays. To leave – ⛶, <kbd>F</kbd> or <kbd>Esc</kbd>.</li>
   <li><b>Legend</b> – O (open), H (high), L (low), C (close) and the change; hovering shows that candle.</li>
   <li><b>Zoom:</b> mouse wheel on the chart – time zoom; wheel over the price axis – price zoom; wheel over the time axis – time zoom around the cursor; the axes can be dragged. <b>Auto</b> or a double-click on the price axis restores automatic scaling, <b>⤢</b> shows the whole period, <b>Log</b> switches the logarithmic scale (on by default).</li>
   <li><b>Marks on the chart:</b> arrows – your fills; solid line – the position entry (long green, short red); orange dotted – the liquidation price; dashed – resting orders (TP orange, SL violet, with the expected PnL). Options are drawn as strike, break-even, TP and SL lines (see <a href="#options">Options</a>).</li>
@@ -145,9 +146,10 @@
 </ul>
 
 <h2 id="draw">7. Drawing tools</h2>
-<p>In the transport bar under <b>Draw</b>: ╱ trend line and ↗ ray (two clicks), ― horizontal and │ vertical line (one click), colour, line style (solid, dashed, dotted), width (1–4 px), 🔒 lock, ⌫ eraser and 🗑 delete all.</p>
+<p>In the transport bar under <b>Draw</b>: ╱ trend line and ↗ ray (two clicks), ― horizontal and │ vertical line (one click), colour (palette), line style (solid, dashed, dotted), width (1–4 px), 🔒 lock, ⌫ eraser and 🗑 delete all.</p>
 <ul>
   <li>Lines are stored by time and price, so they appear on both charts; they are remembered per instrument in this browser.</li>
+  <li>The colour button opens a palette (as in TradingView): a grey ramp, 10 base colours with lighter and darker shades, and your own colours (<b>+</b> to pick, right-click to remove). <b>Set as default</b> saves the current colour, line style and width for new lines (and the next start of the app), <b>Apply default</b> applies them to the selected line. The default colour is marked with a white dot.</li>
   <li>With no tool active: click a line to select it; drag it to move it; drag an end handle to move that end; <kbd>Ctrl</kbd> + drag drags a copy (the original stays); <kbd>Delete</kbd> removes it; <kbd>L</kbd> or 🔒 locks / unlocks it.</li>
   <li><kbd>Shift</kbd> while placing the second point or dragging an end makes the line exactly horizontal. Trend lines and rays show their on-screen angle at the start.</li>
   <li>A locked line cannot be moved or deleted (not even with the eraser or "delete all"). <kbd>Esc</kbd> cancels the tool or the selection.</li>
@@ -161,6 +163,7 @@
   <li><b>Take profit / Stop loss</b> – when the order fills, opposite reduce-only orders are placed automatically (TP – limit, SL – stop). They work as OCO: when one fills, the other is cancelled.</li>
   <li><b>TP/SL units:</b> <b>Price</b> – an absolute price; <b>%</b> – price move from the entry; <b>$ P&amp;L</b> – profit / loss in dollars for the whole order. Enter positive numbers – the side follows Buy / Sell. The resulting prices and PnL are shown below the fields.</li>
   <li><b>Reduce-only</b> – the order can only reduce or close the position. <b>Post-only</b> (limit) – rejected if it would fill immediately.</li>
+  <li><b>Hedge mode</b> (Settings) – as on Bybit: a long and a short in the same instrument are kept apart, each with its own entry price, TP/SL, funding and trade. The buttons become <b>Open Long</b> / <b>Open Short</b>, and with Reduce-only ticked <b>Close Short</b> / <b>Close Long</b>. Margin is shared (cross) and the liquidation price covers both positions. The mode can be changed only without positions and orders; spot is always one-way.</li>
   <li><b>Estimate</b> – order value, margin, fee and the largest possible quantity.</li>
 </ul>
 <p>Shortcuts: <kbd>B</kbd> – market buy, <kbd>S</kbd> – market sell, <kbd>X</kbd> – close the position at market.</p>
@@ -196,7 +199,7 @@
 <h2 id="tabs">11. Bottom tabs and CSV</h2>
 <table>
   <tr><th>Tab</th><th>Contents</th></tr>
-  <tr><td>Positions</td><td>The open Spot/Futures position: size, entry, last price, Max / Min since opening (with times), unrealized and best PnL, liquidation price and margin, fees and funding, TP/SL, the <b>TP/SL</b> and <b>Close</b> buttons. With an option chain loaded – also the Options section.</td></tr>
+  <tr><td>Positions</td><td>The open Spot/Futures position: size, entry, last price, Max / Min since opening (with times), unrealized and best PnL, liquidation price and margin, fees and funding, TP/SL, the <b>TP/SL</b> and <b>Close</b> buttons; in hedge mode separate long and short rows and the net position. With an option chain loaded – also the Options section.</td></tr>
   <tr><td>Orders</td><td>Resting orders (RO – reduce-only, PO – post-only) with a <b>Cancel</b> button.</td></tr>
   <tr><td>Fills</td><td>Every fill: time, side, quantity, price, type, liquidity (maker / taker / liquidation / settlement), fee, realized PnL.</td></tr>
   <tr><td>Trades</td><td>Closed positions from opening to the full close: entry, exit, Max / Min while held, Max / Min after closing (Spot/Futures – until the current replay time, options – until expiry), best P&amp;L, gross PnL, fees, funding, net. The favourable extreme is highlighted in yellow.</td></tr>
@@ -213,7 +216,7 @@
   <tr><th>Loaded instrument</th><th>Options</th><th>Rules</th></tr>
   <tr><td>Deribit inverse BTC/ETH (e.g. <code>BTC-PERPETUAL</code>)</td><td>BTC, ETH; premium in coin</td><td>1 contract = 1 coin (min. 0.1); fee 0.03 % per contract, at most 12.5 % of the premium</td></tr>
   <tr><td>Deribit linear USDC (e.g. <code>SOL_USDC-PERPETUAL</code>)</td><td>BTC, ETH, SOL, XRP, AVAX, HYPE, TRX; price in USDC</td><td>contract size and tick per asset (e.g. BTC 0.01, SOL 10, XRP 1000)</td></tr>
-  <tr><td>Bybit linear BTCUSDT / ETHUSDT</td><td>BTC, ETH; price in USDT</td><td>Bybit: min. 0.01 BTC / 0.1 ETH, tick 5 / 0.1 USDT, fee 0.03 % of the index, at most 7 % of the premium; no delivery fee on daily options</td></tr>
+  <tr><td>Bybit linear BTCUSDT / ETHUSDT, BTCPERP / ETHPERP</td><td>BTC, ETH; price in USDT (PERP – USDC)</td><td>Bybit: min. 0.01 BTC / 0.1 ETH, tick 5 / 0.1 USDT, fee 0.03 % of the index, at most 7 % of the premium; no delivery fee on daily options</td></tr>
 </table>
 <h3>Chain</h3>
 <ul>
@@ -262,6 +265,7 @@
   <tr><td>Limit fills</td><td>through</td><td>Through / touch / queue (see <a href="#fills">section 9</a>).</td></tr>
   <tr><td>Option spread ±</td><td>1.5 %</td><td>Distance of synthetic Bid/Ask from the mark.</td></tr>
   <tr><td>Apply funding payments</td><td>on</td><td>Perpetual funding.</td></tr>
+  <tr><td>Hedge mode</td><td>off</td><td>Separate long and short (like Bybit hedge mode); when off – one-way mode, an opposite order reduces or flips the position.</td></tr>
   <tr><td>Option strike lines on the chart</td><td>on</td><td>Strike, break-even, TP and SL lines.</td></tr>
   <tr><td>Day separators on the chart</td><td>on</td><td>Vertical lines at the start of each day.</td></tr>
 </table>
@@ -274,6 +278,7 @@
   <tr><td>Candle forward</td><td><kbd>→</kbd></td></tr>
   <tr><td>Market buy / sell</td><td><kbd>B</kbd> / <kbd>S</kbd></td></tr>
   <tr><td>Close position</td><td><kbd>X</kbd></td></tr>
+  <tr><td>Charts full screen / leave</td><td><kbd>F</kbd> / <kbd>Esc</kbd></td></tr>
   <tr><td>Help mode</td><td><kbd>F1</kbd></td></tr>
   <tr><td>Cancel the drawing tool or selection; close a window</td><td><kbd>Esc</kbd></td></tr>
   <tr><td>Delete / lock the selected line</td><td><kbd>Delete</kbd> / <kbd>L</kbd></td></tr>
@@ -328,7 +333,7 @@
 <h3>No order book</h3>
 <p>The book exists only for Bybit linear and spot instruments since mid-2025. Elsewhere orders fill against the trade tape.</p>
 <h3>No option chain</h3>
-<p>The chain appears only after loading a Deribit BTC/ETH inverse, Deribit USDC linear or Bybit BTCUSDT / ETHUSDT instrument. If there are no prices yet, start the replay – IV appears after the first option trades.</p>
+<p>The chain appears only after loading a Deribit BTC/ETH inverse, Deribit USDC linear or Bybit BTCUSDT / ETHUSDT / BTCPERP / ETHPERP instrument. If there are no prices yet, start the replay – IV appears after the first option trades.</p>
 <h3>The chart scale is "stuck"</h3>
 <p>Click <b>Auto</b> or double-click the price axis; <b>⤢</b> shows the whole period.</p>
 <h3>My drawings are gone</h3>

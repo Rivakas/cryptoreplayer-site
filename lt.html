@@ -12,7 +12,7 @@
   <h1>CryptoReplayer – naudotojo vadovas</h1>
   <div class="langs"><a href="lt.html" aria-current="page">LT</a><a href="en.html" hreflang="en">EN</a><a href="ru.html" hreflang="ru">RU</a></div>
 </header>
-<p class="meta">Programos versija 0.1.0 · vadovas atnaujintas 2026-10-11</p>
+<p class="meta">Programos versija 0.2.0 · vadovas atnaujintas 2026-10-20</p>
 
 <p>CryptoReplayer – istorinių kriptovaliutų sandorių peržiūros („replay“) ir prekybos simuliacijos programa. Ji atkuria tikrą <b>Bybit</b> ir <b>Deribit</b> sandorių eigą jūsų kompiuteryje ir leidžia joje prekiauti taip, lyg rinka vyktų dabar: su komisiniais, funding mokėjimais, slydimu, vėlinimu, svertu, likvidavimu, opcionais ir kelių kojų opcionų strategijomis. Visi rinkos duomenys gaunami nemokamai, paskyros ar API raktų nereikia.</p>
 
@@ -96,7 +96,7 @@
   <tr><th>Sritis</th><th>Kas joje</th></tr>
   <tr><td>Viršutinė juosta</td><td>Birža, tipas, instrumentas, „pasibaigę“ (Deribit), apšilimo ir prekybos datos, dienų skaičius, <b>Įkelti</b>, būsenos eilutė, <b>⚙ Nustatymai</b>, <b>? Pagalba</b>, <b>📖</b> (šis vadovas) ir kalbos pasirinkimas.</td></tr>
   <tr><td>Transporto juosta</td><td>⏮ į pradžią, ▶/⏸, ⏭ žvakė į priekį, greitis, grafikų išdėstymas, piešimo įrankiai, vaizdai <b>Grafikas</b> / <b>Opcionų grandinė</b> (kai yra opcionų), laiko juosta, laikrodis ir laiko zona.</td></tr>
-  <tr><td>Grafikai</td><td>Vienas arba du kainos grafikai su savo intervalais. Kiekvieno kampe – intervalo pasirinkimas, legenda ir mygtukai ⤢, Log, Auto.</td></tr>
+  <tr><td>Grafikai</td><td>Vienas arba du kainos grafikai su savo intervalais. Kiekvieno kampe – intervalo pasirinkimas, legenda ir mygtukai ⛶ (per visą ekraną), ⤢, Log, Auto.</td></tr>
   <tr><td>Dešinė juosta</td><td>Pavedimo forma (arba opciono forma, kai pasirinktas opcionas), Order book (Bybit, kai yra duomenų) ir Sąskaita.</td></tr>
   <tr><td>Apatinė juosta</td><td>Kortelės Pozicijos, Pavedimai, Įvykdymai, Sandoriai, Strategijos, Įvykiai, Sandorių juosta, Kapitalo kreivė ir CSV eksportas.</td></tr>
 </table>
@@ -114,10 +114,10 @@
 </table>
 <h3>Laukai</h3>
 <ul>
-  <li><b>Instrumentas</b> – spustelėkite, kad matytumėte visą sąrašą; rašykite, kad jį filtruotumėte. Rodomi tik instrumentai, kuriems yra nemokamų duomenų. Pasirinkus instrumentą būsenos eilutėje matyti, nuo kada iki kada yra duomenų.</li>
+  <li><b>Instrumentas</b> – spustelėkite, kad matytumėte visą sąrašą; rašykite, kad jį filtruotumėte. Rodomi tik instrumentai, kuriems yra nemokamų duomenų. Pasirinkus instrumentą būsenos eilutėje matyti, nuo kada iki kada yra duomenų. <b>★</b> šalia – penki dažniausiai įkeliami instrumentai (iš visų biržų ir tipų): spustelėjus įkeliama iš karto, × pašalina eilutę.</li>
   <li><b>pasibaigę</b> (Deribit) – į sąrašą įtraukti jau pasibaigusius ateities sandorius.</li>
-  <li><b>Apšilimas nuo (UTC)</b> – nuo kada grafike rodoma istorija prieš prekybą. Ji imama iš biržų kline API, tik piešiama, prekiauti joje negalima. Aukštesniems intervalams automatiškai rodoma bent ~200 žvakių, bet ne daugiau kaip metai atgal.</li>
-  <li><b>Prekyba nuo (UTC)</b> ir <b>Dienų</b> (1–14) – laikotarpis, kurį peržiūrite su tikrais sandoriais.</li>
+  <li><b>Apšilimas nuo (UTC)</b> – nuo kada grafike rodoma istorija prieš prekybą. Ji imama iš biržų kline API, tik piešiama, prekiauti joje negalima. Grafikas prasideda tiksliai nuo šios datos. Jei apšilimas nenurodytas (data sutampa su „Prekyba nuo“), valandiniams ir aukštesniems intervalams automatiškai rodoma ~200 žvakių. Apšilimas – iki metų atgal, dienoms, savaitėms ir mėnesiams – iki 6 metų.</li>
+  <li><b>Prekyba nuo (UTC)</b> ir <b>Dienų</b> (1–14) – laikotarpis, kurį peržiūrite su tikrais sandoriais. Kai duomenys jau įkelti, pakeitus šias datas arba apšilimą naujas laikotarpis įkeliamas automatiškai (jei turite poziciją, pavedimų ar istoriją – pirmiausia paklausiama, nes sąskaita atstatoma).</li>
 </ul>
 <p>Paspaudus <b>Įkelti</b> parsiunčiami sandoriai, funding istorija, apšilimo žvakės, Bybit order book (jei yra) ir opcionų duomenys (jei instrumentas jų turi). Sąskaita atstatoma, replay pradedamas nuo pirmo sandorio.</p>
 <div class="note"><b>Duomenų prieinamumas.</b> Bybit dienos failas paskelbiamas kitą dieną apie 01:00 UTC, todėl šiandienos Bybit duomenų nėra. Deribit leidžia įkelti ir šiandienos (dar nepilnus) duomenis – jie nekešuojami. Visos datos – UTC paros.</div>
@@ -136,7 +136,8 @@
 <h2 id="charts">6. Grafikai</h2>
 <ul>
   <li><b>Grafikai: 2 greta</b> – du grafikai (pagal nutylėjimą kairėje 1D, dešinėje 15 min); <b>1</b> – tik dešinysis. Abu sinchronizuoti: tas pats replay laikas, pozicijos, pavedimai ir piešiniai.</li>
-  <li><b>Intervalas</b> (kiekvieno grafiko kampe): 1s, 5s, 15s, 1m, 5m, 15m, 1h, 4h, 1D. Žvakės perskaičiuojamos iš sandorių, niekas neprarandama.</li>
+  <li><b>Intervalas</b> (kiekvieno grafiko kampe): 1s, 5s, 15s, 1m, 5m, 15m, 1h, 4h, 1D, 1W (savaitė nuo pirmadienio), 1M (kalendorinis mėnuo). Žvakės perskaičiuojamos iš sandorių, niekas neprarandama. Sąraše × pašalina intervalą, apačioje „Pridėti intervalą“ – savas (pvz. 3 minutės, 2 valandos, 2 savaitės, 3 mėnesiai), „Atkurti numatytuosius“ grąžina pradinį sąrašą. Sąrašas bendras abiem grafikams ir įsimenamas.</li>
+  <li><b>⛶</b> (kiekvieno grafiko apačioje, klavišas <kbd>F</kbd>) – tas grafikas per visą ekraną (<kbd>F</kbd> – grafikas, virš kurio yra pelė): paslepiamas kitas grafikas, viršutinė juosta, šoninis skydelis ir apatinės lentelės, replay ir piešimo juosta lieka. Išeiti – ⛶, <kbd>F</kbd> arba <kbd>Esc</kbd>.</li>
   <li><b>Legenda</b> – A (atidarymo), Aukšt, Žem, U (uždarymo) kainos ir pokytis; užvedus pelę rodoma ta žvakė.</li>
   <li><b>Mastelis:</b> pelės ratukas grafike – laiko mastelis; ratukas ant kainų ašies – kainų mastelis; ratukas ant laiko ašies – laiko mastelis aplink žymeklį; ašis galima tempti. <b>Auto</b> arba dvigubas spustelėjimas ant kainų ašies grąžina automatinį mastelį, <b>⤢</b> parodo visą laikotarpį, <b>Log</b> įjungia logaritminę skalę (pagal nutylėjimą įjungta).</li>
   <li><b>Žymės grafike:</b> rodyklės – jūsų įvykdymai; ištisinė linija – pozicijos įėjimas (long žalia, short raudona); oranžinė taškinė – likvidavimo kaina; brūkšninės – laukiantys pavedimai (TP oranžinė, SL violetinė, su tikėtinu PnL). Opcionai rodomi strike, break-even, TP ir SL linijomis (žr. <a href="#options">Opcionai</a>).</li>
@@ -145,9 +146,10 @@
 </ul>
 
 <h2 id="draw">7. Piešimo įrankiai</h2>
-<p>Transporto juostoje <b>Piešti</b>: ╱ trendo linija ir ↗ spindulys (du paspaudimai), ― horizontali ir │ vertikali linija (vienas paspaudimas), spalva, linijos tipas (ištisinė, brūkšninė, taškinė), storis (1–4 px), 🔒 užrakinimas, ⌫ trintukas ir 🗑 ištrinti visas.</p>
+<p>Transporto juostoje <b>Piešti</b>: ╱ trendo linija ir ↗ spindulys (du paspaudimai), ― horizontali ir │ vertikali linija (vienas paspaudimas), spalva (paletė), linijos tipas (ištisinė, brūkšninė, taškinė), storis (1–4 px), 🔒 užrakinimas, ⌫ trintukas ir 🗑 ištrinti visas.</p>
 <ul>
   <li>Linijos saugomos laiku ir kaina, todėl matomos abiejuose grafikuose; jos įsimenamos kiekvienam instrumentui atskirai šioje naršyklėje.</li>
+  <li>Spalvos mygtukas atidaro paletę (kaip TradingView): pilkų atspalvių eilė, 10 pagrindinių spalvų su šviesesniais ir tamsesniais atspalviais ir savos spalvos (<b>+</b> – pasirinkti, dešiniu pelės mygtuku – pašalinti). <b>Nustatyti kaip numatytąją</b> išsaugo dabartinę spalvą, linijos tipą ir storį naujoms linijoms (ir kitam programos paleidimui), <b>Taikyti numatytąją</b> juos pritaiko pasirinktai linijai. Numatytoji spalva paletėje pažymėta baltu tašku.</li>
   <li>Be aktyvaus įrankio: spustelėkite liniją – ji pasirenkama; tempkite – perkeliama; tempkite galo rankenėlę – keičiamas tas galas; <kbd>Ctrl</kbd> + tempti – tempiama kopija (originalas lieka); <kbd>Delete</kbd> – ištrinti; <kbd>L</kbd> arba 🔒 – užrakinti / atrakinti.</li>
   <li><kbd>Shift</kbd> dedant antrą tašką arba tempiant galą – linija tiksliai horizontali. Prie trendo linijos ir spindulio pradžios rodomas kampas ekrane.</li>
   <li>Užrakintos linijos negalima pajudinti ar ištrinti (net trintuku ar „ištrinti visas“). <kbd>Esc</kbd> atšaukia įrankį arba pasirinkimą.</li>
@@ -161,6 +163,7 @@
   <li><b>Take profit / Stop loss</b> – įvykdžius pavedimą automatiškai pateikiami priešingi „tik mažinti“ pavedimai (TP – limit, SL – stop). Jie veikia kaip OCO: įvykdžius vieną, kitas atšaukiamas.</li>
   <li><b>TP/SL vienetai:</b> <b>Kaina</b> – absoliuti kaina; <b>%</b> – kainos pokytis nuo įėjimo; <b>$ P&amp;L</b> – pelnas / nuostolis doleriais visam pavedimui. Įvedami teigiami skaičiai – kryptį nulemia Pirkti / Parduoti. Po laukeliais matote gaunamas kainas ir PnL.</li>
   <li><b>Tik mažinti</b> – pavedimas gali tik sumažinti ar uždaryti poziciją. <b>Post-only</b> (limit) – atmetamas, jei būtų įvykdytas iš karto.</li>
+  <li><b>Hedge režimas</b> (Nustatymai) – kaip Bybit: long ir short to paties instrumento laikomi atskirai, kiekviena su savo įėjimo kaina, TP/SL, funding ir sandoriu. Mygtukai tampa <b>Atidaryti Long</b> / <b>Atidaryti Short</b>, o pažymėjus „Tik mažinti“ – <b>Uždaryti Short</b> / <b>Uždaryti Long</b>. Marža bendra (cross), likvidavimo kaina skaičiuojama abiem pozicijoms kartu. Režimą galima keisti tik be pozicijų ir pavedimų; spot visada vienpusis.</li>
   <li><b>Įvertis</b> – pavedimo vertė, marža, mokestis ir didžiausias galimas kiekis.</li>
 </ul>
 <p>Spartieji klavišai: <kbd>B</kbd> – rinkos pirkimas, <kbd>S</kbd> – rinkos pardavimas, <kbd>X</kbd> – uždaryti poziciją rinkos kaina.</p>
@@ -196,7 +199,7 @@
 <h2 id="tabs">11. Apatinės kortelės ir CSV</h2>
 <table>
   <tr><th>Kortelė</th><th>Turinys</th></tr>
-  <tr><td>Pozicijos</td><td>Atidaryta Spot/Futures pozicija: dydis, įėjimas, paskutinė kaina, Max / Min nuo atidarymo (su laiku), nerealizuotas ir geriausias PnL, likvidavimo kaina ir marža, komisiniai ir funding, TP/SL, mygtukai <b>TP/SL</b> ir <b>Uždaryti</b>. Kai įkelta opcionų grandinė – ir skyrius Opcionai.</td></tr>
+  <tr><td>Pozicijos</td><td>Atidaryta Spot/Futures pozicija: dydis, įėjimas, paskutinė kaina, Max / Min nuo atidarymo (su laiku), nerealizuotas ir geriausias PnL, likvidavimo kaina ir marža, komisiniai ir funding, TP/SL, mygtukai <b>TP/SL</b> ir <b>Uždaryti</b>; hedge režime – atskiros long ir short eilutės ir grynoji pozicija. Kai įkelta opcionų grandinė – ir skyrius Opcionai.</td></tr>
   <tr><td>Pavedimai</td><td>Laukiantys pavedimai (RO – tik mažinti, PO – post-only) su mygtuku <b>Atšaukti</b>.</td></tr>
   <tr><td>Įvykdymai</td><td>Kiekvienas įvykdymas: laikas, kryptis, kiekis, kaina, tipas, likvidumas (maker / taker / likvidavimas / išpirkimas), mokestis, realizuotas PnL.</td></tr>
   <tr><td>Sandoriai</td><td>Uždarytos pozicijos nuo atidarymo iki pilno uždarymo: įėjimas, išėjimas, Max / Min kol laikėte, Max / Min po uždarymo (Spot/Futures – iki dabartinio replay laiko, opcionams – iki galiojimo pabaigos), geriausias P&amp;L, bruto PnL, komisiniai, funding, grynasis. Palankus kraštutinumas paryškintas geltonai.</td></tr>
@@ -213,7 +216,7 @@
   <tr><th>Įkeltas instrumentas</th><th>Opcionai</th><th>Taisyklės</th></tr>
   <tr><td>Deribit inverse BTC/ETH (pvz. <code>BTC-PERPETUAL</code>)</td><td>BTC, ETH; premija monetomis</td><td>1 kontraktas = 1 moneta (min. 0,1); mokestis 0,03 % kontraktui, ne daugiau 12,5 % premijos</td></tr>
   <tr><td>Deribit linear USDC (pvz. <code>SOL_USDC-PERPETUAL</code>)</td><td>BTC, ETH, SOL, XRP, AVAX, HYPE, TRX; kaina USDC</td><td>kontrakto dydis ir kainos žingsnis pagal turtą (pvz. BTC 0,01, SOL 10, XRP 1000)</td></tr>
-  <tr><td>Bybit linear BTCUSDT / ETHUSDT</td><td>BTC, ETH; kaina USDT</td><td>Bybit: min. 0,01 BTC / 0,1 ETH, žingsnis 5 / 0,1 USDT, mokestis 0,03 % indekso, ne daugiau 7 % premijos; dieniniams opcionams išpirkimo mokesčio nėra</td></tr>
+  <tr><td>Bybit linear BTCUSDT / ETHUSDT, BTCPERP / ETHPERP</td><td>BTC, ETH; kaina USDT (PERP – USDC)</td><td>Bybit: min. 0,01 BTC / 0,1 ETH, žingsnis 5 / 0,1 USDT, mokestis 0,03 % indekso, ne daugiau 7 % premijos; dieniniams opcionams išpirkimo mokesčio nėra</td></tr>
 </table>
 <h3>Grandinė</h3>
 <ul>
@@ -262,6 +265,7 @@
   <tr><td>Limit įvykdymas</td><td>perėjimas</td><td>Perėjimas / palietimas / eilė (žr. <a href="#fills">9 skyrių</a>).</td></tr>
   <tr><td>Opcionų spread ±</td><td>1,5 %</td><td>Sintetinių Bid/Ask atstumas nuo mark.</td></tr>
   <tr><td>Skaičiuoti funding</td><td>įjungta</td><td>Perpetual funding mokėjimai.</td></tr>
+  <tr><td>Hedge režimas</td><td>išjungta</td><td>Long ir short atskirai (kaip Bybit hedge mode); išjungus – vienpusis režimas, priešingas pavedimas mažina arba apverčia poziciją.</td></tr>
   <tr><td>Opcionų strike linijos grafike</td><td>įjungta</td><td>Strike, break-even, TP ir SL linijos.</td></tr>
   <tr><td>Dienų skirtukai grafike</td><td>įjungta</td><td>Vertikalios linijos ties dienos pradžia.</td></tr>
 </table>
@@ -274,6 +278,7 @@
   <tr><td>Žvakė į priekį</td><td><kbd>→</kbd></td></tr>
   <tr><td>Rinkos pirkimas / pardavimas</td><td><kbd>B</kbd> / <kbd>S</kbd></td></tr>
   <tr><td>Uždaryti poziciją</td><td><kbd>X</kbd></td></tr>
+  <tr><td>Grafikai per visą ekraną / išeiti</td><td><kbd>F</kbd> / <kbd>Esc</kbd></td></tr>
   <tr><td>Pagalbos režimas</td><td><kbd>F1</kbd></td></tr>
   <tr><td>Atšaukti piešimo įrankį, pasirinkimą; uždaryti langą</td><td><kbd>Esc</kbd></td></tr>
   <tr><td>Ištrinti / užrakinti pasirinktą liniją</td><td><kbd>Delete</kbd> / <kbd>L</kbd></td></tr>
@@ -328,7 +333,7 @@
 <h3>Nėra Order book</h3>
 <p>Knyga yra tik Bybit linear ir spot instrumentams nuo 2025 m. vidurio. Kitur pavedimai vykdomi pagal sandorių juostą.</p>
 <h3>Nėra opcionų grandinės</h3>
-<p>Grandinė atsiranda tik įkėlus Deribit BTC/ETH inverse, Deribit USDC linear arba Bybit BTCUSDT / ETHUSDT instrumentą. Jei kainų dar nėra, paleiskite replay – IV atsiranda po pirmų opcionų sandorių.</p>
+<p>Grandinė atsiranda tik įkėlus Deribit BTC/ETH inverse, Deribit USDC linear arba Bybit BTCUSDT / ETHUSDT / BTCPERP / ETHPERP instrumentą. Jei kainų dar nėra, paleiskite replay – IV atsiranda po pirmų opcionų sandorių.</p>
 <h3>Grafiko mastelis „užstrigo“</h3>
 <p>Spauskite <b>Auto</b> arba dukart spustelėkite kainų ašį; <b>⤢</b> parodo visą laikotarpį.</p>
 <h3>Dingo piešiniai</h3>
